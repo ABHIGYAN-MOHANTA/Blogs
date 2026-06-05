@@ -13,7 +13,6 @@ import ThemeToggle from './ThemeToggle.astro';
 			<HeaderLink href="/about">About</HeaderLink>
 		</div>
 		<div class="nav-right">
-			<ThemeToggle />
 			<div class="social-links">
 				<a href="https://m.webtoo.ls/@astro" target="_blank">
 					<span class="sr-only">Follow Astro on Mastodon</span>
@@ -43,6 +42,7 @@ import ThemeToggle from './ThemeToggle.astro';
 					>
 				</a>
 			</div>
+			<ThemeToggle />
 		</div>
 	</nav>
 </header>
@@ -67,6 +67,8 @@ import ThemeToggle from './ThemeToggle.astro';
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
+		flex-wrap: wrap;
+		gap: 0;
 	}
 	nav a {
 		padding: 1em 0.5em;
@@ -79,6 +81,10 @@ import ThemeToggle from './ThemeToggle.astro';
 		text-decoration: none;
 		border-bottom-color: var(--accent);
 	}
+	.internal-links {
+		display: flex;
+		align-items: center;
+	}
 	.nav-right {
 		display: flex;
 		align-items: center;
@@ -89,6 +95,16 @@ import ThemeToggle from './ThemeToggle.astro';
 		display: flex;
 	}
 	@media (max-width: 720px) {
+		nav {
+			flex-wrap: nowrap;
+		}
+		nav a {
+			padding: 0.75em 0.35em;
+			font-size: 0.9em;
+		}
+		h2 {
+			font-size: 0.9em;
+		}
 		.social-links {
 			display: none;
 		}
