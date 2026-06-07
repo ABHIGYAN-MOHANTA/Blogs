@@ -1,48 +1,477 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { Image } from "astro:assets";
+import BaseHead from "../components/BaseHead.astro";
+import Footer from "../components/Footer.astro";
+import Header from "../components/Header.astro";
+import profileImage from "../assets/profile.jpg";
+import { SITE_AUTHOR, SITE_TITLE } from "../consts";
+
+const homeTitle = `${SITE_TITLE} | ${SITE_AUTHOR}`;
+const homeDescription =
+	"Personal site and technical blog by Abhigyan Mohanta on Kubernetes, AI-native infrastructure, platform engineering, system design, and software delivery.";
+
+const currentSignals = [
+	"RL-driven Kubernetes Scheduling",
+	"Real-time Media Pipelines",
+	"Multi-LLM Architectures",
+	"MCP Clients & Voice Agents",
+	"Go & Elixir Backends",
+];
+
+const profileLinks = [
+	{ label: "GitHub", href: "https://github.com/ABHIGYAN-MOHANTA" },
+	{
+		label: "LinkedIn",
+		href: "https://www.linkedin.com/in/abhigyan-mohanta/",
+	},
+	{ label: "X", href: "https://x.com/MohantaAbhigyan" },
+];
+
+const homeSchema = {
+	"@context": "https://schema.org",
+	"@type": "ProfilePage",
+	name: homeTitle,
+	description: homeDescription,
+	url: Astro.site
+		? new URL("/", Astro.site).toString()
+		: Astro.url.toString(),
+	mainEntity: {
+		"@type": "Person",
+		name: SITE_AUTHOR,
+		url: Astro.site
+			? new URL("/", Astro.site).toString()
+			: Astro.url.toString(),
+		sameAs: [
+			"https://github.com/ABHIGYAN-MOHANTA",
+			"https://www.linkedin.com/in/abhigyan-mohanta/",
+			"https://x.com/MohantaAbhigyan",
+		],
+	},
+};
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={homeTitle} description={homeDescription} />
+		<script
+			type="application/ld+json"
+			set:html={JSON.stringify(homeSchema)}
+		/>
+		<style>
+			main {
+				width: 1040px;
+			}
+
+			.hero-shell {
+				position: relative;
+				overflow: hidden;
+				margin-top: 1rem;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 18px;
+				background:
+					radial-gradient(
+						circle at 18% 20%,
+						rgba(35, 55, 255, 0.18),
+						transparent 28rem
+					),
+					radial-gradient(
+						circle at 92% 12%,
+						rgba(var(--gray-light), 0.75),
+						transparent 24rem
+					),
+					linear-gradient(
+						135deg,
+						rgba(var(--gray-light), 0.28),
+						rgba(var(--gray-light), 0.08)
+					);
+				box-shadow: 0 18px 60px rgba(var(--gray), 0.18);
+			}
+
+			.hero-shell::before {
+				position: absolute;
+				inset: 0;
+				background-image:
+					linear-gradient(
+						rgba(var(--gray-light), 0.55) 1px,
+						transparent 1px
+					),
+					linear-gradient(
+						90deg,
+						rgba(var(--gray-light), 0.55) 1px,
+						transparent 1px
+					);
+				background-size: 38px 38px;
+				content: "";
+				mask-image: linear-gradient(120deg, black, transparent 70%);
+				pointer-events: none;
+			}
+
+			.hero {
+				position: relative;
+				display: grid;
+				grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.72fr);
+				gap: 2rem;
+				align-items: start;
+				padding: 2.4rem;
+			}
+
+			.eyebrow {
+				margin: 0 0 0.75rem;
+				color: var(--accent);
+				font-size: 0.75rem;
+				font-weight: 700;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+			}
+
+			h1 {
+				max-width: 760px;
+				margin: 0 0 1rem;
+				font-size: clamp(2.45rem, 5.4vw, 4.35rem);
+				letter-spacing: -0.055em;
+				line-height: 0.94;
+			}
+
+			.hero-copy {
+				max-width: 680px;
+				margin: 0;
+				color: rgb(var(--gray));
+				font-size: 1.08rem;
+				line-height: 1.65;
+			}
+
+			.hero-actions {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.75rem;
+				margin-top: 1.5rem;
+			}
+
+			.button {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				min-height: 2.7rem;
+				padding: 0 1rem;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 999px;
+				background: rgba(var(--bg-card, var(--gray-light)), 0.2);
+				color: rgb(var(--black));
+				font-size: 0.95rem;
+				font-weight: 700;
+				text-decoration: none;
+			}
+
+			.button.primary {
+				border-color: var(--accent);
+				background: var(--accent);
+				color: #fff;
+			}
+
+			.button:hover {
+				box-shadow: var(--box-shadow);
+				color: rgb(var(--black));
+			}
+
+			.button.primary:hover {
+				color: #fff;
+			}
+
+			.signal-row {
+				display: grid;
+				grid-template-columns: repeat(3, 1fr);
+				gap: 0.8rem;
+				margin-top: 2rem;
+				max-width: 720px;
+			}
+
+			.signal {
+				border-left: 3px solid var(--accent);
+				padding-left: 0.75rem;
+			}
+
+			.signal strong {
+				display: block;
+				color: rgb(var(--black));
+				font-size: 1.02rem;
+				line-height: 1.2;
+			}
+
+			.signal span {
+				display: block;
+				margin-top: 0.15rem;
+				color: rgb(var(--gray));
+				font-size: 0.85rem;
+				line-height: 1.35;
+			}
+
+			.hero-card {
+				display: flex;
+				flex-direction: column;
+				gap: 1rem;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 16px;
+				background: rgba(var(--bg-surface, 255, 255, 255), 0.72);
+				backdrop-filter: blur(18px);
+				padding: 1.1rem;
+			}
+
+			.dark .hero-card {
+				background: rgba(19, 21, 30, 0.74);
+			}
+
+			.profile-strip {
+				display: grid;
+				grid-template-columns: 84px 1fr;
+				gap: 1rem;
+				align-items: center;
+				padding-bottom: 1rem;
+				border-bottom: 1px solid rgb(var(--gray-light));
+			}
+
+			.avatar {
+				border-radius: 16px;
+				box-shadow: 0 12px 30px rgba(var(--gray), 0.28);
+			}
+
+			.profile-strip h2 {
+				margin: 0;
+				font-size: 1.22rem;
+				line-height: 1.15;
+			}
+
+			.profile-strip p {
+				margin: 0.25rem 0 0;
+				color: rgb(var(--gray));
+				font-size: 0.88rem;
+				line-height: 1.35;
+			}
+
+			.profile-note {
+				margin: 0;
+				color: rgb(var(--gray));
+				font-size: 0.92rem;
+				line-height: 1.55;
+			}
+
+			.card-section {
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 12px;
+				background: rgba(var(--gray-light), 0.18);
+				padding: 0.85rem;
+			}
+
+			.card-section strong {
+				display: block;
+				margin-bottom: 0.25rem;
+				color: rgb(var(--black));
+				font-size: 0.84rem;
+				letter-spacing: 0.08em;
+				line-height: 1;
+				text-transform: uppercase;
+			}
+
+			.card-section p {
+				margin: 0;
+				color: rgb(var(--gray));
+				font-size: 0.9rem;
+				line-height: 1.5;
+			}
+
+			.profile-links {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.45rem;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+
+			.profile-links a {
+				display: inline-flex;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 999px;
+				color: rgb(var(--gray-dark));
+				font-size: 0.82rem;
+				font-weight: 700;
+				line-height: 1;
+				padding: 0.55rem 0.68rem;
+				text-decoration: none;
+			}
+
+			.profile-links a:hover {
+				border-color: var(--accent);
+				color: var(--accent);
+			}
+
+			.topic-strip {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.55rem;
+				margin: 1rem 0 0;
+				padding: 0;
+				list-style: none;
+			}
+
+			.topic-strip li {
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 999px;
+				background: rgba(var(--gray-light), 0.26);
+				color: rgb(var(--gray-dark));
+				font-size: 0.82rem;
+				font-weight: 700;
+				line-height: 1;
+				padding: 0.55rem 0.7rem;
+			}
+
+			.site-note {
+				display: grid;
+				grid-template-columns: minmax(0, 0.65fr) minmax(0, 1fr);
+				gap: 1rem;
+				margin-top: 1rem;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 16px;
+				background: rgba(var(--gray-light), 0.14);
+				padding: 1rem;
+			}
+
+			.site-note h2 {
+				margin: 0;
+				font-size: 1.25rem;
+				letter-spacing: -0.02em;
+			}
+
+			.site-note p {
+				margin: 0;
+				color: rgb(var(--gray));
+				font-size: 0.95rem;
+				line-height: 1.55;
+			}
+
+			@media (max-width: 860px) {
+				main {
+					width: 100%;
+				}
+
+				.hero {
+					grid-template-columns: 1fr;
+				}
+
+				.hero {
+					padding: 1.25rem;
+				}
+
+				.signal-row,
+				.site-note {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
 	</head>
 	<body>
 		<Header />
 		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
+			<section class="hero-shell" aria-labelledby="home-title">
+				<div class="hero">
+					<div>
+						<p class="eyebrow">Personal field notes</p>
+						<h1 id="home-title">
+							Cloud-native systems, AI infrastructure, and notes
+							from the build.
+						</h1>
+						<p class="hero-copy">
+							I am Abhigyan Mohanta, a software engineer and CNCF
+							Kubestronaut specializing in Kubernetes, AI/ML
+							systems, and the engineering work that turns ideas
+							into runnable, explainable systems.
+						</p>
+						<div class="hero-actions">
+							<a class="button primary" href="/blog/"
+								>Explore the blog</a
+							>
+							<a class="button" href="/about/">Know the person</a>
+						</div>
+						<div class="signal-row" aria-label="Site highlights">
+							<div class="signal">
+								<strong>CNCF Kubestronaut</strong>
+								<span
+									>Cloud native by practice, not just
+									vocabulary.</span
+								>
+							</div>
+							<div class="signal">
+								<strong>AI-native systems</strong>
+								<span
+									>Infrastructure, Scaling, Scheduling,
+									evaluation, and demos.</span
+								>
+							</div>
+							<div class="signal">
+								<strong>Learning in public</strong>
+								<span
+									>Research notes, build logs, and honest
+									tradeoffs.</span
+								>
+							</div>
+						</div>
+					</div>
+
+					<aside class="hero-card" aria-label="Current profile">
+						<div>
+							<div class="profile-strip">
+								<Image
+									class="avatar"
+									src={profileImage}
+									alt="Abhigyan Mohanta"
+									width={84}
+									height={84}
+									densities={[1.5, 2]}
+								/>
+								<div>
+									<h2>Abhigyan Mohanta</h2>
+									<p>
+										Software Engineer. Cloud Native builder.
+										AI/ML Systems.
+									</p>
+								</div>
+							</div>
+							<p class="profile-note" style="padding-top: 4%;">
+								This site serves as my public notebook for
+								systems work: exploring what I build, why it
+								breaks, how I measure performance, and what the
+								final implementation reveals.
+							</p>
+						</div>
+						<div class="card-section">
+							<strong>Current focus</strong>
+							<p>
+								Kubernetes scheduling, platform engineering, and
+								AI infrastructure.
+							</p>
+						</div>
+						<ul class="profile-links" aria-label="Profile links">
+							{
+								profileLinks.map((link) => (
+									<li>
+										<a
+											href={link.href}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{link.label}
+										</a>
+									</li>
+								))
+							}
+						</ul>
+					</aside>
+				</div>
+			</section>
+
+			<ul class="topic-strip" aria-label="Topics">
+				{currentSignals.map((signal) => <li>{signal}</li>)}
 			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
 		</main>
 		<Footer />
 	</body>
