@@ -16,6 +16,8 @@ const currentSignals = [
 	"Multi-LLM Architectures",
 	"MCP Clients & Voice Agents",
 	"Go & Elixir Backends",
+	"FullStack AI-Native Applications",
+	"Concurrency",
 ];
 
 const profileLinks = [
@@ -86,6 +88,10 @@ const homeSchema = {
 						rgba(var(--gray-light), 0.08)
 					);
 				box-shadow: 0 18px 60px rgba(var(--gray), 0.18);
+			}
+
+			.dark .hero-shell {
+				box-shadow: 0 18px 60px rgba(0, 0, 0, 0.5);
 			}
 
 			.hero-shell::before {
@@ -210,15 +216,6 @@ const homeSchema = {
 				display: flex;
 				flex-direction: column;
 				gap: 1rem;
-				border: 1px solid rgb(var(--gray-light));
-				border-radius: 16px;
-				background: rgba(var(--bg-surface, 255, 255, 255), 0.72);
-				backdrop-filter: blur(18px);
-				padding: 1.1rem;
-			}
-
-			.dark .hero-card {
-				background: rgba(19, 21, 30, 0.74);
 			}
 
 			.profile-strip {
@@ -226,13 +223,11 @@ const homeSchema = {
 				grid-template-columns: 84px 1fr;
 				gap: 1rem;
 				align-items: center;
-				padding-bottom: 1rem;
-				border-bottom: 1px solid rgb(var(--gray-light));
+				padding-bottom: 0.5rem;
 			}
 
 			.avatar {
 				border-radius: 16px;
-				box-shadow: 0 12px 30px rgba(var(--gray), 0.28);
 			}
 
 			.profile-strip h2 {
@@ -256,10 +251,7 @@ const homeSchema = {
 			}
 
 			.card-section {
-				border: 1px solid rgb(var(--gray-light));
-				border-radius: 12px;
-				background: rgba(var(--gray-light), 0.18);
-				padding: 0.85rem;
+				padding: 0.5rem 0;
 			}
 
 			.card-section strong {
@@ -446,8 +438,8 @@ const homeSchema = {
 						<div class="card-section">
 							<strong>Current focus</strong>
 							<p>
-								Kubernetes scheduling, platform engineering, and
-								AI infrastructure.
+								Kubernetes scheduling, Go Concurrency, and AI
+								infrastructure.
 							</p>
 						</div>
 						<ul class="profile-links" aria-label="Profile links">
