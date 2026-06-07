@@ -3,9 +3,19 @@ const today = new Date();
 ---
 
 <footer>
-	&copy; {today.getFullYear()} Abhigyan Mohanta. All rights reserved.
+	<p class="footer-copyright">
+		&copy; {today.getFullYear()} Abhigyan Mohanta. All rights reserved.
+	</p>
+	<p class="footer-tagline">
+		Geeking out on System Design, AI, DevOps and everything Cloud Native.
+	</p>
 	<div class="social-links">
-		<a href="https://www.linkedin.com/in/abhigyan-mohanta/" target="_blank">
+		<a
+			href="https://www.linkedin.com/in/abhigyan-mohanta/"
+			target="_blank"
+			rel="noopener noreferrer"
+			title="Connect with Abhigyan Mohanta on LinkedIn"
+		>
 			<span class="sr-only">Connect on LinkedIn</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32"
 				><path
@@ -14,7 +24,12 @@ const today = new Date();
 				></path></svg
 			>
 		</a>
-		<a href="https://x.com/MohantaAbhigyan" target="_blank">
+		<a
+			href="https://x.com/MohantaAbhigyan"
+			target="_blank"
+			rel="noopener noreferrer"
+			title="Follow Abhigyan Mohanta on X"
+		>
 			<span class="sr-only">Follow on X</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32"
 				><path
@@ -23,7 +38,12 @@ const today = new Date();
 				></path></svg
 			>
 		</a>
-		<a href="https://github.com/ABHIGYAN-MOHANTA" target="_blank">
+		<a
+			href="https://github.com/ABHIGYAN-MOHANTA"
+			target="_blank"
+			rel="noopener noreferrer"
+			title="View Abhigyan Mohanta's GitHub profile"
+		>
 			<span class="sr-only">View GitHub profile</span>
 			<svg viewBox="0 0 16 16" aria-hidden="true" width="32" height="32"
 				><path
@@ -40,7 +60,18 @@ const today = new Date();
 		background: linear-gradient(var(--gray-gradient)) no-repeat;
 		color: rgb(var(--gray));
 		text-align: center;
-		transition: background-color 0.3s ease, color 0.3s ease;
+		transition:
+			background-color 0.3s ease,
+			color 0.3s ease;
+	}
+	.footer-copyright {
+		margin: 0 0 0.3em;
+	}
+	.footer-tagline {
+		margin: 0;
+		font-size: 0.9em;
+		font-style: italic;
+		opacity: 0.8;
 	}
 	.social-links {
 		display: flex;

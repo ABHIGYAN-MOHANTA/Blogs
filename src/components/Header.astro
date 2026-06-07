@@ -17,6 +17,8 @@ import ThemeToggle from "./ThemeToggle.astro";
 				<a
 					href="https://www.linkedin.com/in/abhigyan-mohanta/"
 					target="_blank"
+					rel="noopener noreferrer"
+					title="Connect with Abhigyan Mohanta on LinkedIn"
 				>
 					<span class="sr-only">Connect on LinkedIn</span>
 					<svg
@@ -30,7 +32,7 @@ import ThemeToggle from "./ThemeToggle.astro";
 						></path></svg
 					>
 				</a>
-				<a href="https://x.com/MohantaAbhigyan" target="_blank">
+				<a href="https://x.com/MohantaAbhigyan" target="_blank" rel="noopener noreferrer" title="Follow Abhigyan Mohanta on X">
 					<span class="sr-only">Follow on X</span>
 					<svg
 						viewBox="0 0 16 16"
@@ -43,7 +45,7 @@ import ThemeToggle from "./ThemeToggle.astro";
 						></path></svg
 					>
 				</a>
-				<a href="https://github.com/ABHIGYAN-MOHANTA" target="_blank">
+				<a href="https://github.com/ABHIGYAN-MOHANTA" target="_blank" rel="noopener noreferrer" title="View Abhigyan Mohanta's GitHub profile">
 					<span class="sr-only">View GitHub profile</span>
 					<svg
 						viewBox="0 0 16 16"
@@ -72,6 +74,7 @@ import ThemeToggle from "./ThemeToggle.astro";
 	h2 {
 		margin: 0;
 		font-size: 1.15em;
+		white-space: nowrap;
 	}
 
 	h2 a,
@@ -111,14 +114,23 @@ import ThemeToggle from "./ThemeToggle.astro";
 	}
 	@media (max-width: 720px) {
 		nav {
-			flex-wrap: nowrap;
-		}
-		nav a {
-			padding: 0.75em 0.35em;
-			font-size: 0.9em;
+			flex-wrap: wrap;
+			justify-content: center;
+			padding: 0.5em 0;
+			gap: 0.5em;
 		}
 		h2 {
-			font-size: 1.15em;
+			font-size: 1.35em;
+			width: 100%;
+			text-align: center;
+		}
+		.internal-links {
+			display: flex;
+			gap: 0.5em;
+		}
+		nav a {
+			padding: 0.5em;
+			font-size: 0.95em;
 		}
 		.social-links {
 			display: none;

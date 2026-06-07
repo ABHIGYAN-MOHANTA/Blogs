@@ -1,24 +1,64 @@
 ---
-import { Image } from 'astro:assets';
-import { getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
-import Header from '../../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import BaseHead from "../../components/BaseHead.astro";
+import Footer from "../../components/Footer.astro";
+import FormattedDate from "../../components/FormattedDate.astro";
+import Header from "../../components/Header.astro";
+import { SITE_AUTHOR } from "../../consts";
 
-const posts = (await getCollection('blog')).sort(
+const blogTitle =
+	"Blog - System Design, AI, DevOps & Software Engineering | Cloud Native Abhigyan";
+const blogDescription =
+	"Browse technical articles and deep dives into system design, artificial intelligence, DevOps, Kubernetes, platform engineering, and full stack development by Abhigyan Mohanta.";
+
+const posts = (await getCollection("blog")).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
 );
+
+// CollectionPage JSON-LD
+const collectionSchema = {
+	"@context": "https://schema.org",
+	"@type": "CollectionPage",
+	name: blogTitle,
+	description: blogDescription,
+	url: new URL("/blog", Astro.site).toString(),
+	author: {
+		"@type": "Person",
+		name: SITE_AUTHOR,
+	},
+	mainEntity: {
+		"@type": "ItemList",
+		itemListElement: posts.map((post, index) => ({
+			"@type": "ListItem",
+			position: index + 1,
+			url: new URL(`/blog/${post.id}/`, Astro.site).toString(),
+			name: post.data.title,
+		})),
+	},
+};
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+		<BaseHead title={blogTitle} description={blogDescription} />
+		<script
+			type="application/ld+json"
+			set:html={JSON.stringify(collectionSchema)}
+		/>
 		<style>
 			main {
 				width: 960px;
+			}
+			h1 {
+				font-size: 2.2em;
+				margin-bottom: 0.3em;
+			}
+			.page-intro {
+				color: rgb(var(--gray));
+				margin-bottom: 2rem;
+				font-size: 1.05em;
 			}
 			ul {
 				display: flex;
@@ -89,6 +129,11 @@ const posts = (await getCollection('blog')).sort(
 	<body>
 		<Header />
 		<main>
+			<h1>Blog</h1>
+			<p class="page-intro">
+				Articles on system design, artificial intelligence, DevOps,
+				Kubernetes, platform engineering, and software development.
+			</p>
 			<section>
 				<ul>
 					{
@@ -96,11 +141,18 @@ const posts = (await getCollection('blog')).sort(
 							<li>
 								<a href={`/blog/${post.id}/`}>
 									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
+										<Image
+											width={720}
+											height={360}
+											src={post.data.heroImage}
+											alt={post.data.title}
+										/>
 									)}
 									<h4 class="title">{post.data.title}</h4>
 									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
+										<FormattedDate
+											date={post.data.pubDate}
+										/>
 									</p>
 								</a>
 							</li>
