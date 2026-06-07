@@ -1,0 +1,84 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+
+interface Props {
+    error: unknown;
+}
+
+const { error } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`500 - Server Error | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			.error-container {
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				text-align: center;
+				min-height: 50vh;
+			}
+			h1 {
+				font-size: 6rem;
+				margin-bottom: 0.5rem;
+				line-height: 1;
+				color: var(--accent);
+			}
+			h2 {
+				font-size: 2rem;
+				margin-bottom: 1rem;
+			}
+			p {
+				font-size: 1.2rem;
+				margin-bottom: 2rem;
+			}
+			.back-home {
+				padding: 0.8rem 1.5rem;
+				background-color: var(--accent);
+				color: white;
+				text-decoration: none;
+				border-radius: 8px;
+				font-weight: bold;
+				transition: background-color 0.2s;
+			}
+			.back-home:hover {
+				background-color: var(--accent-dark);
+				color: white;
+			}
+			.error-details {
+				margin-top: 2rem;
+				padding: 1rem;
+				background-color: var(--code-bg);
+				border-radius: 8px;
+				text-align: left;
+				max-width: 100%;
+				overflow-x: auto;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="error-container">
+				<h1>500</h1>
+				<h2>Internal Server Error</h2>
+				<p>Oops! Something went wrong on our end.</p>
+				<a href="/" class="back-home">Go Back Home</a>
+				
+				{error instanceof Error && import.meta.env.DEV && (
+					<div class="error-details">
+						<p><strong>Error Details (visible only in dev mode):</strong></p>
+						<pre><code>{error.message}</code></pre>
+					</div>
+				)}
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
