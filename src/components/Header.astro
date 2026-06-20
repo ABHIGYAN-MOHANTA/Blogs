@@ -12,7 +12,7 @@ import ThemeToggle from "./ThemeToggle.astro";
 			<HeaderLink href="/blog">Blog</HeaderLink>
 			<HeaderLink href="/about">About</HeaderLink>
 		</div>
-		<div class="nav-right">
+		<div class="nav-actions">
 			<div class="social-links">
 				<a
 					href="https://www.linkedin.com/in/abhigyan-mohanta/"
@@ -60,8 +60,61 @@ import ThemeToggle from "./ThemeToggle.astro";
 				</a>
 			</div>
 			<ThemeToggle />
+			<!-- Mobile hamburger button -->
+			<div class="mobile-controls">
+				<button
+					id="mobile-menu-toggle"
+					type="button"
+					aria-label="Toggle navigation menu"
+					aria-expanded="false"
+				>
+					<span class="hamburger-line"></span>
+					<span class="hamburger-line"></span>
+					<span class="hamburger-line"></span>
+				</button>
+			</div>
 		</div>
 	</nav>
+
+	<!-- Mobile slide-down menu -->
+	<div id="mobile-menu" class="mobile-menu">
+		<div class="mobile-menu-links">
+			<HeaderLink href="/">Home</HeaderLink>
+			<HeaderLink href="/blog">Blog</HeaderLink>
+			<HeaderLink href="/about">About</HeaderLink>
+		</div>
+		<div class="mobile-menu-social">
+			<a
+				href="https://www.linkedin.com/in/abhigyan-mohanta/"
+				target="_blank"
+				rel="noopener noreferrer"
+				title="LinkedIn"
+			>
+				<svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24"
+					><path
+						fill="currentColor"
+						d="M0 1.146C0 .513.526 0 1.175 0h13.65C15.474 0 16 .513 16 1.146v13.708c0 .633-.526 1.146-1.175 1.146H1.175C.526 16 0 15.487 0 14.854V1.146zm4.943 12.248V6.169H2.542v7.225h2.401zm-1.2-8.212c.837 0 1.358-.554 1.358-1.248-.015-.709-.52-1.248-1.342-1.248-.822 0-1.359.54-1.359 1.248 0 .694.521 1.248 1.327 1.248h.016zm4.908 8.212V9.359c0-.216.016-.432.08-.586.173-.431.568-.878 1.232-.878.869 0 1.216.662 1.216 1.634v3.865h2.401V9.25c0-2.22-1.184-3.252-2.764-3.252-1.274 0-1.845.7-2.165 1.193v.025h-.016a5.54 5.54 0 0 1 .016-.025V6.169h-2.4c.03.678 0 7.225 0 7.225h2.4z"
+					></path></svg
+				>
+			</a>
+			<a href="https://x.com/MohantaAbhigyan" target="_blank" rel="noopener noreferrer" title="X">
+				<svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24"
+					><path
+						fill="currentColor"
+						d="M12.6.75h2.454l-5.36 6.142L16 15.25h-4.937l-3.867-5.07-4.425 5.07H.316l5.733-6.57L0 .75h5.063l3.495 4.633L12.601.75Zm-.86 13.028h1.36L4.323 2.145H2.865l8.875 11.633Z"
+					></path></svg
+				>
+			</a>
+			<a href="https://github.com/ABHIGYAN-MOHANTA" target="_blank" rel="noopener noreferrer" title="GitHub">
+				<svg viewBox="0 0 16 16" aria-hidden="true" width="24" height="24"
+					><path
+						fill="currentColor"
+						d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.012 8.012 0 0 0 16 8c0-4.42-3.58-8-8-8z"
+					></path></svg
+				>
+			</a>
+		</div>
+	</div>
 </header>
 <style>
 	header {
@@ -70,11 +123,14 @@ import ThemeToggle from "./ThemeToggle.astro";
 		background: var(--header-bg);
 		box-shadow: 0 2px 8px rgba(var(--black), 5%);
 		transition: background-color 0.3s ease;
+		position: relative;
 	}
 	h2 {
 		margin: 0;
-		font-size: 1.15em;
+		font-size: clamp(0.85em, 2.5vw, 1.15em);
 		white-space: nowrap;
+		min-width: 0;
+		flex-shrink: 1;
 	}
 
 	h2 a,
@@ -85,8 +141,9 @@ import ThemeToggle from "./ThemeToggle.astro";
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
-		flex-wrap: wrap;
+		position: relative;
 		gap: 0;
+		overflow: hidden;
 	}
 	nav a {
 		padding: 1em 0.5em;
@@ -102,38 +159,201 @@ import ThemeToggle from "./ThemeToggle.astro";
 	.internal-links {
 		display: flex;
 		align-items: center;
-	}
-	.nav-right {
-		display: flex;
-		align-items: center;
-		gap: 0.5em;
+		position: absolute;
+		left: 50%;
+		transform: translateX(-50%);
 	}
 	.social-links,
 	.social-links a {
 		display: flex;
 	}
+
+	.nav-actions {
+		display: flex;
+		align-items: center;
+		gap: 0.5em;
+	}
+
+	/* Mobile controls - hidden on desktop */
+	.mobile-controls {
+		display: none;
+	}
+
+	/* Hamburger button - hidden on desktop */
+	#mobile-menu-toggle {
+		display: none;
+	}
+
+	/* Mobile menu - hidden on desktop */
+	.mobile-menu {
+		display: none;
+	}
+
 	@media (max-width: 720px) {
+		header {
+			padding: 0 1em;
+		}
 		nav {
-			flex-wrap: wrap;
-			justify-content: center;
-			padding: 0.5em 0;
-			gap: 0.5em;
+			flex-wrap: nowrap;
+			justify-content: space-between;
+			padding: 0.65em 0;
+			gap: 0;
 		}
 		h2 {
-			font-size: 1.35em;
-			width: 100%;
-			text-align: center;
+			font-size: 1.1em;
+			width: auto;
+			text-align: left;
 		}
+
+		/* Hide desktop nav elements on mobile */
 		.internal-links {
-			display: flex;
-			gap: 0.5em;
-		}
-		nav a {
-			padding: 0.5em;
-			font-size: 0.95em;
+			display: none;
+			position: static;
+			transform: none;
 		}
 		.social-links {
 			display: none;
 		}
+
+		/* Show mobile controls */
+		.mobile-controls {
+			display: flex;
+			align-items: center;
+			gap: 0.25em;
+		}
+
+		/* Show hamburger button */
+		#mobile-menu-toggle {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			gap: 5px;
+			background: none;
+			border: none;
+			cursor: pointer;
+			padding: 8px;
+			border-radius: 8px;
+			width: 40px;
+			height: 40px;
+			transition: background-color 0.2s ease;
+			z-index: 101;
+		}
+		#mobile-menu-toggle:hover {
+			background-color: rgba(var(--gray-light), 0.6);
+		}
+		.hamburger-line {
+			display: block;
+			width: 22px;
+			height: 2px;
+			background-color: rgb(var(--black));
+			border-radius: 2px;
+			transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+				opacity 0.2s ease,
+				background-color 0.3s ease;
+			transform-origin: center;
+		}
+
+		/* Hamburger → X animation */
+		#mobile-menu-toggle.open .hamburger-line:nth-child(1) {
+			transform: translateY(7px) rotate(45deg);
+		}
+		#mobile-menu-toggle.open .hamburger-line:nth-child(2) {
+			opacity: 0;
+			transform: scaleX(0);
+		}
+		#mobile-menu-toggle.open .hamburger-line:nth-child(3) {
+			transform: translateY(-7px) rotate(-45deg);
+		}
+
+		/* Mobile slide-down menu */
+		.mobile-menu {
+			display: block;
+			max-height: 0;
+			overflow: hidden;
+			transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1),
+				opacity 0.3s ease;
+			opacity: 0;
+			border-top: 1px solid rgba(var(--gray-light), 0.5);
+		}
+		.mobile-menu.open {
+			max-height: 320px;
+			opacity: 1;
+		}
+		.mobile-menu-links {
+			display: flex;
+			flex-direction: column;
+			padding: 0.5em 0;
+		}
+		.mobile-menu-links :global(a) {
+			display: block;
+			padding: 0.75em 1em;
+			color: rgb(var(--black));
+			text-decoration: none;
+			font-size: 1em;
+			font-weight: 500;
+			border-bottom: none;
+			border-radius: 8px;
+			margin: 0 0.25em;
+			transition: background-color 0.2s ease, color 0.2s ease;
+		}
+		.mobile-menu-links :global(a:hover),
+		.mobile-menu-links :global(a.active) {
+			background-color: rgba(var(--gray-light), 0.4);
+			color: var(--accent);
+		}
+		.mobile-menu-links :global(a.active) {
+			font-weight: 700;
+			border-left: 3px solid var(--accent);
+			border-radius: 0 8px 8px 0;
+		}
+		.mobile-menu-social {
+			display: flex;
+			gap: 1em;
+			padding: 0.75em 1em;
+			border-top: 1px solid rgba(var(--gray-light), 0.3);
+		}
+		.mobile-menu-social a {
+			color: rgb(var(--gray));
+			padding: 0.4em;
+			border-radius: 8px;
+			transition: color 0.2s ease, background-color 0.2s ease;
+			display: flex;
+			border-bottom: none;
+		}
+		.mobile-menu-social a:hover {
+			color: var(--accent);
+			background-color: rgba(var(--gray-light), 0.4);
+		}
 	}
 </style>
+
+<script>
+	function initMobileMenu() {
+		const toggle = document.getElementById("mobile-menu-toggle");
+		const menu = document.getElementById("mobile-menu");
+		if (!toggle || !menu) return;
+
+		// Remove old listeners by cloning
+		const newToggle = toggle.cloneNode(true) as HTMLElement;
+		toggle.parentNode?.replaceChild(newToggle, toggle);
+
+		newToggle.addEventListener("click", () => {
+			const isOpen = newToggle.classList.toggle("open");
+			menu.classList.toggle("open");
+			newToggle.setAttribute("aria-expanded", String(isOpen));
+		});
+
+		// Close menu when a link is clicked
+		menu.querySelectorAll("a").forEach((link) => {
+			link.addEventListener("click", () => {
+				newToggle.classList.remove("open");
+				menu.classList.remove("open");
+				newToggle.setAttribute("aria-expanded", "false");
+			});
+		});
+	}
+
+	initMobileMenu();
+	document.addEventListener("astro:after-swap", initMobileMenu);
+</script>

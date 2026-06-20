@@ -1,5 +1,10 @@
 # Astro Starter Kit: Blog
 
+TODO:
+sitemap
+rss
+
+
 ```sh
 npm create astro@latest -- --template blog
 ```
