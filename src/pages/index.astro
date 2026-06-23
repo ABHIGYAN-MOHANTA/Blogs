@@ -34,6 +34,30 @@ const profileLinks = [
 	{ label: "Book a call", href: calendlyUrl },
 ];
 
+const techStack = [
+	"Go",
+	"Python",
+	"TypeScript",
+	"React.js",
+	"Node.js",
+	"HTML5",
+	"CSS3",
+	"Kubernetes",
+	"Terraform",
+	"AWS",
+	"GCP",
+	"LLMs",
+	"RAG",
+	"Vector Databases",
+	"Google Gemini",
+	"Scikit-Learn",
+	"PyTorch",
+	"PostgreSQL",
+	"Apache Kafka",
+	"gRPC",
+	"Websockets",
+];
+
 const strengths = [
 	{
 		title: "Cloud-native systems",
@@ -912,6 +936,15 @@ const homeSchema = {
 								))
 							}
 						</ul>
+						<div class="card-section" style="margin-top: 1.5rem;">
+							<strong>Tech Stack</strong>
+							<ul
+								class="tag-list"
+								style="margin-top: 0.6rem; margin-bottom: 0;"
+							>
+								{techStack.map((tech) => <li>{tech}</li>)}
+							</ul>
+						</div>
 					</aside>
 				</div>
 			</section>
