@@ -32,8 +32,23 @@ const collectionSchema = {
 		itemListElement: posts.map((post, index) => ({
 			"@type": "ListItem",
 			position: index + 1,
-			url: new URL(`/blog/${post.id}/`, Astro.site).toString(),
-			name: post.data.title,
+			item: {
+				"@type": "BlogPosting",
+				url: new URL(`/blog/${post.id}/`, Astro.site).toString(),
+				name: post.data.title,
+				headline: post.data.title,
+				description: post.data.description,
+				datePublished: post.data.pubDate.toISOString(),
+				dateModified: (
+					post.data.updatedDate ?? post.data.pubDate
+				).toISOString(),
+				...(post.data.heroImage && {
+					image: new URL(
+						post.data.heroImage.src,
+						Astro.site,
+					).toString(),
+				}),
+			},
 		})),
 	},
 };
@@ -142,10 +157,12 @@ const collectionSchema = {
 								<a href={`/blog/${post.id}/`}>
 									{post.data.heroImage && (
 										<Image
-											width={720}
-											height={360}
+											width="720"
+											height="480"
 											src={post.data.heroImage}
 											alt={post.data.title}
+											loading="lazy"
+											decoding="async"
 										/>
 									)}
 									<h4 class="title">{post.data.title}</h4>

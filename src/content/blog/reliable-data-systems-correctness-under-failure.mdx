@@ -1,0 +1,204 @@
+---
+title: 'Building Reliable Data Systems, Part 3: Correctness Under Failure'
+description: 'Field notes from DDIA on partial failures, clocks, linearizability, consensus, and coordination in distributed systems.'
+pubDate: '2025-09-10T12:00:00Z'
+updatedDate: '2026-06-23T12:00:00Z'
+tags: ['Distributed Systems', 'Consensus', 'Fault Tolerance', 'System Design', 'DDIA']
+heroImage: '../../assets/reliable-data-systems-part-3.jpg'
+---
+
+
+
+Part 2 covered replication, partitioning, and transactions. Part 3 is where distributed systems become uncomfortable.
+
+On one machine, failure is often obvious. A process crashes. A disk fills up. The machine is down.
+
+Across machines, failure is partial. Some nodes keep running while others are slow, paused, partitioned, overloaded, or unreachable. The system has to make decisions without ever having a perfect view of reality.
+
+<div className="article-callout">
+	<p>Part 3 is about correctness under uncertainty. The theme: in distributed systems, timeout does not mean failure. It means you do not know what happened.</p>
+</div>
+
+## Networks Lie By Omission
+
+When one node sends a request to another, many things can happen:
+
+- The request may arrive.
+- The request may be lost.
+- The request may be delayed.
+- The response may be lost.
+- The remote node may process the request and crash before replying.
+- The remote node may be alive but too overloaded to respond before the timeout.
+
+If no reply comes back, the caller cannot know which case happened.
+
+That uncertainty is the heart of distributed systems. A timeout is not a fact about another node. It is a fact about your observation of that node.
+
+This is why degraded nodes can be worse than crashed nodes. A crashed node is at least clear. A slow node creates ambiguity and can keep accepting partial work.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> distributed protocols must be correct even when messages are delayed, lost, duplicated, or observed through stale assumptions.</p>
+
+## Clocks Are Not A Global Truth
+
+Time feels universal until machines disagree about it.
+
+| Clock Type | Useful For | Failure Mode |
+|---|---|---|
+| Time-of-day clock | Human timestamps and wall-clock events | Can jump forward or backward |
+| Monotonic clock | Measuring durations | Still has drift and uncertainty |
+
+Wall clocks can move due to NTP adjustments, leap seconds, configuration mistakes, or VM behavior. If a system treats wall-clock time as absolute truth, bugs appear in expiry checks, leases, sessions, cache invalidation, and authentication.
+
+Monotonic clocks are safer for measuring elapsed time because they only move forward. But they still do not give a shared global ordering across machines.
+
+The practical lesson is to treat clock readings as measurements with error bounds, not as perfect facts.
+
+## Processes Can Pause
+
+A process can stop running and later resume as if nothing happened.
+
+Common causes include:
+
+- Garbage collection pauses.
+- CPU starvation.
+- Page faults.
+- VM suspension.
+- Host overload.
+
+Other nodes may decide the paused process is dead. But when it resumes, it may still hold stale assumptions, old leases, or outdated leadership state.
+
+This is one reason distributed locks and leases are tricky. A node can believe it still owns something after the rest of the system has moved on.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> leadership, leases, and locks must account for pause-the-world behavior, not just clean crashes.</p>
+
+## Truth Comes From A System Model
+
+Distributed algorithms need assumptions. DDIA distinguishes between different system models because an algorithm that works with bounded delays may fail when delays are unbounded.
+
+| Assumption | What It Means | Why It Matters |
+|---|---|---|
+| Synchronous model | Message delays and pauses have known bounds | Easier reasoning, unrealistic for many networks |
+| Partially synchronous model | Bounds eventually hold, but not always | Practical basis for many real systems |
+| Asynchronous model | No timing bounds can be assumed | Hardest model for coordination |
+
+The book also separates crash faults from Byzantine faults. Crash faults mean a node stops. Byzantine faults mean a node may lie, corrupt data, or behave arbitrarily.
+
+Most mainstream databases assume crash faults, not Byzantine behavior. That is why quorums and majorities matter: if a majority of nodes agrees, the system can make progress despite some faulty or unreachable nodes.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> every distributed guarantee rests on a system model. If the real world violates the model, the guarantee may not mean what you think it means.</p>
+
+## Linearizability Is The Strong Single-System Illusion
+
+Linearizability means every operation appears to happen atomically at one point in time, and all clients agree on the order.
+
+It makes replicated data behave like a single variable.
+
+That is useful for:
+
+- Locks.
+- Leader election.
+- Unique username constraints.
+- Compare-and-set operations.
+- Any workflow where stale reads break correctness.
+
+The cost is coordination. If every operation must agree on a global order, then network round trips and quorum availability enter the critical path.
+
+| Model | What It Gives | Cost |
+|---|---|---|
+| Linearizability | Simple, global, up-to-date semantics | Coordination and latency |
+| Causal consistency | Preserves cause-before-effect relationships | More complex mental model |
+| Eventual consistency | High availability and low coordination | Application must tolerate temporary disagreement |
+
+Linearizability is powerful because it is easy to reason about. It is expensive for the same reason: the system has to maintain that illusion across unreliable machines.
+
+## CAP Is About Partitions Forcing A Choice
+
+The useful version of CAP is narrow but important.
+
+When a network partition happens, a system must choose between:
+
+- Consistency, usually meaning linearizability.
+- Availability, meaning every non-failing node can continue serving requests.
+
+During a partition, you cannot guarantee both perfectly.
+
+CAP does not mean every database can be summarized by picking two letters. It means partitions force a trade-off. Outside partitions, systems make many other choices around latency, durability, isolation, and operations.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> CAP is not a shopping menu. It is a reminder that partitions turn consistency and availability into an explicit product decision.</p>
+
+## Causality Is A Weaker But Scalable Order
+
+Not every system needs one total global order.
+
+Often, what matters is causal order: if event A caused event B, everyone should see A before B.
+
+Causality allows independent events to proceed concurrently. That is much more scalable than forcing every event into one global timeline.
+
+Tools for reasoning about order include:
+
+- Sequence numbers.
+- Lamport timestamps.
+- Version vectors.
+- Happens-before relationships.
+
+This is the difference between "everything has one order" and "related things preserve their order." Many systems only need the second.
+
+## Total Order Broadcast And Consensus
+
+Total order broadcast means all nodes deliver the same messages in the same order.
+
+That gives us replicated logs. If every replica processes the same operations in the same sequence, each replica can maintain the same state.
+
+Consensus and total order broadcast are deeply connected. If nodes can agree on each next log entry, they can build a total order. If they have total order broadcast, they can agree on decisions.
+
+Consensus appears behind many familiar problems:
+
+| Problem | Why Agreement Matters |
+|---|---|
+| Leader election | Only one leader should be accepted for a term |
+| Replicated logs | Replicas need the same operation order |
+| Compare-and-set | Updates depend on a current value |
+| Membership changes | Nodes must agree who is in the cluster |
+| Uniqueness constraints | Two writers must not claim the same value |
+
+Algorithms like Paxos and Raft make this possible with leaders, epochs or terms, logs, and quorums.
+
+The practical advice is simple: do not casually implement consensus yourself. Use battle-tested systems and understand their guarantees.
+
+## Distributed Transactions Are Hard To Make Available
+
+Atomic commit across nodes sounds simple: either every participant commits, or none do.
+
+Two-phase commit uses a coordinator:
+
+1. Prepare: ask each participant whether it can commit.
+2. Commit: if everyone agrees, tell them to commit.
+
+The failure mode is coordinator failure. Participants may be stuck "in doubt" because they cannot safely decide alone.
+
+That blocking behavior is why distributed transactions are operationally expensive. They can provide strong guarantees, but they reduce availability and create recovery complexity.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> coordination is one of the most expensive resources in a distributed system. Spend it where correctness truly depends on agreement.</p>
+
+## What I'd Remember In Practice
+
+- A timeout is uncertainty, not proof of failure.
+- Wall-clock time should not be treated as a perfect ordering source.
+- Process pauses can invalidate naive leases and leadership assumptions.
+- Distributed algorithms depend on their assumed fault and timing model.
+- Linearizability is simple for users and expensive for systems.
+- CAP is about what partitions force you to choose.
+- Causality is often enough when a full global order is unnecessary.
+- Consensus powers leader election, replicated logs, and uniqueness, but it belongs on carefully chosen paths.
+- Distributed transactions are correctness tools with availability costs.
+
+<nav className="article-series-nav">
+	<a className="nav-prev" href="/blog/reliable-data-systems-replication-partitioning-transactions/">
+		<span className="nav-label">Previous</span>
+		<span className="nav-title">« Replication, Partitioning, and Transactions</span>
+	</a>
+	<a className="nav-next" href="/blog/reliable-data-systems-batch-streams-dataflow/">
+		<span className="nav-label">Next</span>
+		<span className="nav-title">Batch, Streams, and Dataflow »</span>
+	</a>
+</nav>

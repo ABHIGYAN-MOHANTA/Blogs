@@ -7,8 +7,8 @@ import FallbackImage from "../assets/blog-placeholder-1.jpg";
 import {
 	SITE_TITLE,
 	SITE_DESCRIPTION,
-	SITE_KEYWORDS,
 	SITE_AUTHOR,
+	SITE_LANGUAGE,
 	TWITTER_HANDLE,
 } from "../consts";
 import { Font } from "astro:assets";
@@ -17,28 +17,42 @@ interface Props {
 	title: string;
 	description: string;
 	image?: ImageMetadata;
-	keywords?: string;
+	headline?: string;
 	article?: boolean;
 	pubDate?: Date;
 	updatedDate?: Date;
 	author?: string;
+	tags?: string[];
 }
 
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const rssURL = new URL("/rss.xml", Astro.site);
+const sitemapURL = new URL("/sitemap.xml", Astro.site);
 
 const {
 	title,
 	description,
 	image = FallbackImage,
-	keywords = SITE_KEYWORDS,
+	headline = title,
 	article = false,
 	pubDate,
 	updatedDate,
 	author = SITE_AUTHOR,
+	tags = [],
 } = Astro.props;
 
 const imageURL = new URL(image.src, Astro.site);
 const ogType = article ? "article" : "website";
+const authorSchema = {
+	"@type": "Person",
+	name: author,
+	url: new URL("/", Astro.site).toString(),
+	sameAs: [
+		"https://github.com/ABHIGYAN-MOHANTA",
+		"https://www.linkedin.com/in/abhigyan-mohanta/",
+		"https://x.com/MohantaAbhigyan",
+	],
+};
 
 // JSON-LD Structured Data
 const websiteSchema = {
@@ -47,19 +61,9 @@ const websiteSchema = {
 	name: SITE_TITLE,
 	description: SITE_DESCRIPTION,
 	url: Astro.site?.toString(),
-	author: {
-		"@type": "Person",
-		name: SITE_AUTHOR,
-		url: "https://github.com/ABHIGYAN-MOHANTA",
-	},
-	potentialAction: {
-		"@type": "SearchAction",
-		target: {
-			"@type": "EntryPoint",
-			urlTemplate: `${Astro.site?.toString()}blog/?q={search_term_string}`,
-		},
-		"query-input": "required name=search_term_string",
-	},
+	inLanguage: SITE_LANGUAGE,
+	author: authorSchema,
+	publisher: authorSchema,
 };
 
 const articleSchema =
@@ -67,20 +71,18 @@ const articleSchema =
 		? {
 				"@context": "https://schema.org",
 				"@type": "BlogPosting",
-				headline: title,
+				headline,
 				description: description,
-				image: imageURL.toString(),
+				image: [imageURL.toString()],
 				datePublished: pubDate.toISOString(),
-				...(updatedDate && { dateModified: updatedDate.toISOString() }),
-				author: {
-					"@type": "Person",
-					name: author,
-					url: "https://github.com/ABHIGYAN-MOHANTA",
-				},
-				publisher: {
-					"@type": "Person",
-					name: SITE_AUTHOR,
-				},
+				dateModified: (updatedDate ?? pubDate).toISOString(),
+				inLanguage: SITE_LANGUAGE,
+				author: authorSchema,
+				publisher: authorSchema,
+				...(tags.length > 0 && {
+					keywords: tags.join(", "),
+					articleSection: tags[0],
+				}),
 				mainEntityOfPage: {
 					"@type": "WebPage",
 					"@id": canonicalURL.toString(),
@@ -94,12 +96,12 @@ const articleSchema =
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 <link rel="icon" href="/favicon.ico" />
-<link rel="sitemap" href="/sitemap-index.xml" />
+<link rel="sitemap" type="application/xml" href={sitemapURL} />
 <link
 	rel="alternate"
 	type="application/rss+xml"
 	title={SITE_TITLE}
-	href={new URL("rss.xml", Astro.site)}
+	href={rssURL}
 />
 <meta name="generator" content={Astro.generator} />
 
@@ -112,25 +114,22 @@ const articleSchema =
 <title>{title}</title>
 <meta name="title" content={title} />
 <meta name="description" content={description} />
-<meta name="keywords" content={keywords} />
 <meta name="author" content={author} />
 <meta
 	name="robots"
 	content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1"
 />
-<meta name="language" content="en" />
-<meta name="revisit-after" content="3 days" />
-<meta name="rating" content="general" />
+<meta name="language" content={SITE_LANGUAGE} />
 
 <!-- Open Graph / Facebook -->
 <meta property="og:type" content={ogType} />
-<meta property="og:url" content={Astro.url} />
+<meta property="og:url" content={canonicalURL} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={imageURL} />
-<meta property="og:image:width" content="1200" />
-<meta property="og:image:height" content="630" />
-<meta property="og:image:alt" content={title} />
+<meta property="og:image:width" content={image.width.toString()} />
+<meta property="og:image:height" content={image.height.toString()} />
+<meta property="og:image:alt" content={headline} />
 <meta property="og:site_name" content={SITE_TITLE} />
 <meta property="og:locale" content="en_US" />
 
@@ -148,23 +147,19 @@ const articleSchema =
 				/>
 			)}
 			<meta property="article:author" content={author} />
-			<meta property="article:section" content="Technology" />
-			<meta property="article:tag" content="System Design" />
-			<meta property="article:tag" content="AI" />
-			<meta property="article:tag" content="DevOps" />
-			<meta property="article:tag" content="Software Engineering" />
-			<meta property="article:tag" content="Systems Engineering" />
+			{tags.length > 0 && <meta property="article:section" content={tags[0]} />}
+			{tags.map((tag) => <meta property="article:tag" content={tag} />)}
 		</>
 	)
 }
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:url" content={Astro.url} />
+<meta name="twitter:url" content={canonicalURL} />
 <meta name="twitter:title" content={title} />
 <meta name="twitter:description" content={description} />
 <meta name="twitter:image" content={imageURL} />
-<meta name="twitter:image:alt" content={title} />
+<meta name="twitter:image:alt" content={headline} />
 <meta name="twitter:site" content={TWITTER_HANDLE} />
 <meta name="twitter:creator" content={TWITTER_HANDLE} />
 

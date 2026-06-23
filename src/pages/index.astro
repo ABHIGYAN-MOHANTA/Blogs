@@ -8,7 +8,7 @@ import { SITE_AUTHOR, SITE_TITLE } from "../consts";
 
 const homeTitle = `${SITE_TITLE} | ${SITE_AUTHOR}`;
 const homeDescription =
-	"Personal site and technical blog by Abhigyan Mohanta on Kubernetes, AI-native infrastructure, platform engineering, system design, and software delivery.";
+	"Abhigyan Mohanta is a software engineer and CNCF Kubestronaut building Kubernetes, AI-native infrastructure, real-time systems, and practical fullstack applications.";
 
 const currentSignals = [
 	"RL-driven Kubernetes Scheduling",
@@ -20,6 +20,10 @@ const currentSignals = [
 	"Concurrency",
 ];
 
+const calendlyUrl = "https://calendly.com/cloudnativeabhigyan/30min";
+const recommendationsUrl =
+	"https://www.linkedin.com/in/abhigyan-mohanta/details/recommendations/";
+
 const profileLinks = [
 	{ label: "GitHub", href: "https://github.com/ABHIGYAN-MOHANTA" },
 	{
@@ -27,6 +31,175 @@ const profileLinks = [
 		href: "https://www.linkedin.com/in/abhigyan-mohanta/",
 	},
 	{ label: "X", href: "https://x.com/MohantaAbhigyan" },
+	{ label: "Book a call", href: calendlyUrl },
+];
+
+const strengths = [
+	{
+		title: "Cloud-native systems",
+		body: "Kubernetes, admission control, observability, and GitOps work where reliability is designed, measured, and improved under real constraints.",
+	},
+	{
+		title: "AI-native product engineering",
+		body: "Multi-LLM workflows, voice agents, MCP clients, and evaluation-minded prototypes that move from research into usable systems.",
+	},
+	{
+		title: "Real-time fullstack depth",
+		body: "WebSockets, media streaming, PubSub flows, and front-to-back state synchronization for products where latency and UX both matter.",
+	},
+	{
+		title: "Builder energy",
+		body: "I like ambiguous problems, technical research, hands-on implementation, and learning in public until the system actually works.",
+	},
+];
+
+const experiences = [
+	{
+		company: "Arthur Digital",
+		role: "Fullstack Developer",
+		period: "Sep 2024 - Oct 2025",
+		location: "Remote, Munich",
+		body: 'Added multi-LLM support to Arthur Vibe and developed a Slack/Jira MCP client for automated task updates. Integrated LLMs to build voice agent bots and worked on a DataSync service for keeping virtual room data up-to-date across distributed systems. The product I contributed to was <a href="https://www.fox5ny.com/video/1661501" target="_blank" rel="noopener noreferrer" style="color: var(--accent); text-decoration: underline;">featured on Fox News</a>.',
+		tags: ["LLMs", "WebSockets", "FFmpeg", "Puppeteer", "MCP", "PubSub"],
+	},
+	{
+		company: "Super Effective",
+		role: "Full Stack Engineer Intern",
+		period: "Sep 2023 - Aug 2024",
+		location: "Remote, Hong Kong",
+		body: "Developed the Select Threader Chrome Extension to bypass expensive API dependencies, saving $5,000 monthly. Set up CI/CD pipelines for biweekly releases and integrated Sentry. Created an Elixir OAuth V2 service, migrated PostgreSQL models, and integrated thread pages into the Next.js web client.",
+		tags: ["Elixir", "Next.js", "PostgreSQL", "Chrome Extension", "Sentry"],
+	},
+];
+
+const projects = [
+	{
+		name: "AdmiRL",
+		image: "/admirl.png",
+		links: [
+			{
+				label: "GitHub",
+				href: "https://github.com/ABHIGYAN-MOHANTA/AdmiRL",
+			},
+		],
+		status: "Research",
+		body: "A learning-augmented admission control system for gang and elastic GPU workloads in Kueue. It combines cohort-aware gang protection with PPO-based, topology-aware elastic flavor ranking.",
+		tags: ["Python", "PyTorch", "Kubernetes", "Kueue", "RL"],
+	},
+	{
+		name: "Skia Labs",
+		image: "/skialabs.png",
+		links: [
+			{ label: "Live", href: "https://skialabs.hostagedown.com" },
+			{
+				label: "GitHub",
+				href: "https://github.com/ABHIGYAN-MOHANTA/skia-labs",
+			},
+		],
+		status: "Open Source",
+		body: "A beautiful, fast, web-based playground for Skia’s Shader Language (SKSL). Write, preview, and share shaders in real-time, rendered with CanvasKit (Skia WebAssembly) and powered by Next.js.",
+		tags: ["Next.js", "CanvasKit", "Monaco", "TypeScript", "Tailwind"],
+	},
+	{
+		name: "Wands",
+		image: "/wands.png",
+		links: [
+			{ label: "Live", href: "https://wands.hostagedown.com" },
+			{
+				label: "GitHub",
+				href: "https://github.com/ABHIGYAN-MOHANTA/wands",
+			},
+		],
+		status: "Open Source",
+		body: "A two-player browser wizard dueling game featuring a retro low-poly arena, real-time room-based multiplayer, charged spells, and spell reflection.",
+		tags: ["Next.js", "Three.js", "PartyKit", "WebSockets", "TypeScript"],
+	},
+	{
+		name: "ClipOSX",
+		image: "/cliposx.png",
+		links: [
+			{ label: "Website", href: "https://cliposx.hostagedown.com" },
+			{
+				label: "GitHub",
+				href: "https://github.com/abhigyan-mohanta/cliposx",
+			},
+		],
+		status: "macOS App",
+		body: "A modern, native macOS clipboard manager built with Tauri. Features clipboard history, image support, SQLite local storage, and seamless integration with the operating system.",
+		tags: ["Tauri", "Rust", "React", "TypeScript", "SQLite"],
+	},
+	{
+		name: "GitMorph",
+		image: "/gitmorph.png",
+		links: [
+			{ label: "Website", href: "https://gitmorph.hostagedown.com" },
+			{
+				label: "GitHub",
+				href: "https://github.com/ABHIGYAN-MOHANTA/gitmorph",
+			},
+		],
+		status: "CLI Tool",
+		body: "A powerful CLI tool that allows you to seamlessly switch between multiple Git identities on your local machine. Perfect for developers working on different projects with various Git accounts and SSH keys.",
+		tags: ["Go", "Cobra", "CLI", "Git"],
+	},
+	{
+		name: "K8s GitOps Delivery Platform",
+		image: "/k8s-gitops.png",
+		links: [
+			{
+				label: "GitHub",
+				href: "https://github.com/ABHIGYAN-MOHANTA/K8s-Gitops-Delivery-Platform",
+			},
+		],
+		status: "Open Source",
+		body: "A comprehensive Kubernetes GitOps delivery platform featuring automated canary releases with Argo Rollouts, event-driven autoscaling with KEDA, and CI/CD pipelines via Jenkins.",
+		tags: ["Kubernetes", "ArgoCD", "Jenkins", "Grafana", "KEDA"],
+	},
+	{
+		name: "Escape the Fall Season",
+		image: "/escape-the-fall.png",
+		links: [
+			{
+				label: "GitHub",
+				href: "https://github.com/ABHIGYAN-MOHANTA/Escape-the-Fall-Season-CPP-Game",
+			},
+		],
+		status: "Game",
+		body: "A fun 2D arcade game built in C++ and SFML. Play as a character avoiding falling logs and branches with dynamic spawning and intuitive controls.",
+		tags: ["C++", "SFML", "Makefile", "Game Dev"],
+	},
+	{
+		name: "UnbreakableMe",
+		image: "/unbreakableme.png",
+		links: [
+			{
+				label: "GitHub",
+				href: "https://github.com/ABHIGYAN-MOHANTA/UnbreakableMe",
+			},
+		],
+		status: "Archived",
+		body: "A motivational Android app inspired by David Goggins. Designed to help tap into inner resilience with daily quotes, goal tracking, and mindfulness exercises.",
+		tags: ["JavaScript", "React Native", "Expo", "Android"],
+	},
+];
+
+const recommendations = [
+	{
+		name: "Dinesh babu",
+		role: "Head of Cloud Engineering | AI Systems Architect & Builder",
+		date: "August 21, 2025",
+		relationship: "Managed Abhigyan directly",
+		href: "https://www.linkedin.com/in/dinesh-babu-190404109/",
+		quote: "Abhigyan is a proactive problem solver and the go-to person for tackling complex challenges that demand technical research and hands-on implementation.",
+	},
+	{
+		name: "Joze Kosmerl",
+		role: "Senior Full Stack Software Engineer",
+		date: "June 24, 2024",
+		relationship: "Managed Abhigyan directly",
+		href: "https://www.linkedin.com/in/joze-kosmerl/",
+		quote: "He is a great engineer. Very resourceful, hard working, and smart guy. He would be a great addition to any engineering team.",
+	},
 ];
 
 const homeSchema = {
@@ -40,13 +213,22 @@ const homeSchema = {
 	mainEntity: {
 		"@type": "Person",
 		name: SITE_AUTHOR,
+		jobTitle: "Software Engineer",
 		url: Astro.site
 			? new URL("/", Astro.site).toString()
 			: Astro.url.toString(),
+		knowsAbout: [
+			"Kubernetes",
+			"AI infrastructure",
+			"Fullstack engineering",
+			"Distributed systems",
+			"Cloud native platforms",
+		],
 		sameAs: [
 			"https://github.com/ABHIGYAN-MOHANTA",
 			"https://www.linkedin.com/in/abhigyan-mohanta/",
 			"https://x.com/MohantaAbhigyan",
+			calendlyUrl,
 		],
 	},
 };
@@ -62,7 +244,7 @@ const homeSchema = {
 		/>
 		<style>
 			main {
-				width: 1040px;
+				width: 1120px;
 			}
 
 			.hero-shell {
@@ -70,23 +252,12 @@ const homeSchema = {
 				overflow: hidden;
 				margin-top: 1rem;
 				border: 1px solid rgb(var(--gray-light));
-				border-radius: 18px;
-				background:
-					radial-gradient(
-						circle at 18% 20%,
-						rgba(35, 55, 255, 0.18),
-						transparent 28rem
-					),
-					radial-gradient(
-						circle at 92% 12%,
-						rgba(var(--gray-light), 0.75),
-						transparent 24rem
-					),
-					linear-gradient(
-						135deg,
-						rgba(var(--gray-light), 0.28),
-						rgba(var(--gray-light), 0.08)
-					);
+				border-radius: 8px;
+				background: linear-gradient(
+					135deg,
+					rgba(var(--gray-light), 0.28),
+					rgba(var(--gray-light), 0.08)
+				);
 				box-shadow: 0 18px 60px rgba(var(--gray), 0.18);
 			}
 
@@ -119,7 +290,7 @@ const homeSchema = {
 				grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.72fr);
 				gap: 2rem;
 				align-items: start;
-				padding: 2.4rem;
+				padding: 2.6rem;
 			}
 
 			.eyebrow {
@@ -134,9 +305,9 @@ const homeSchema = {
 			h1 {
 				max-width: 760px;
 				margin: 0 0 1rem;
-				font-size: clamp(2.45rem, 5.4vw, 4.35rem);
-				letter-spacing: -0.055em;
-				line-height: 0.94;
+				font-size: 4rem;
+				letter-spacing: 0;
+				line-height: 1;
 			}
 
 			.hero-copy {
@@ -161,7 +332,7 @@ const homeSchema = {
 				min-height: 2.7rem;
 				padding: 0 1rem;
 				border: 1px solid rgb(var(--gray-light));
-				border-radius: 999px;
+				border-radius: 8px;
 				background: rgba(var(--bg-card, var(--gray-light)), 0.2);
 				color: rgb(var(--black));
 				font-size: 0.95rem;
@@ -227,7 +398,7 @@ const homeSchema = {
 			}
 
 			.avatar {
-				border-radius: 16px;
+				border-radius: 8px;
 			}
 
 			.profile-strip h2 {
@@ -283,7 +454,7 @@ const homeSchema = {
 			.profile-links a {
 				display: inline-flex;
 				border: 1px solid rgb(var(--gray-light));
-				border-radius: 999px;
+				border-radius: 8px;
 				color: rgb(var(--gray-dark));
 				font-size: 0.82rem;
 				font-weight: 700;
@@ -308,7 +479,7 @@ const homeSchema = {
 
 			.topic-strip li {
 				border: 1px solid rgb(var(--gray-light));
-				border-radius: 999px;
+				border-radius: 8px;
 				background: rgba(var(--gray-light), 0.26);
 				color: rgb(var(--gray-dark));
 				font-size: 0.82rem;
@@ -317,28 +488,289 @@ const homeSchema = {
 				padding: 0.55rem 0.7rem;
 			}
 
-			.site-note {
+			.section-block {
+				margin-top: 4.5rem;
+			}
+
+			.section-heading {
 				display: grid;
-				grid-template-columns: minmax(0, 0.65fr) minmax(0, 1fr);
+				grid-template-columns: minmax(160px, 0.32fr) minmax(0, 1fr);
+				gap: 1.5rem;
+				align-items: start;
+				margin-bottom: 1.4rem;
+			}
+
+			.section-kicker {
+				margin: 0;
+				color: var(--accent);
+				font-size: 0.78rem;
+				font-weight: 700;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+			}
+
+			.section-heading h2,
+			.contact-panel h2 {
+				margin: 0;
+				font-size: 2.15rem;
+				letter-spacing: 0;
+				line-height: 1.12;
+			}
+
+			.section-heading p,
+			.about-copy p,
+			.contact-panel p {
+				margin: 0;
+				color: rgb(var(--gray));
+				font-size: 1rem;
+				line-height: 1.65;
+			}
+
+			.strength-grid,
+			.project-grid,
+			.recommendation-grid {
+				display: grid;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
 				gap: 1rem;
-				margin-top: 1rem;
+			}
+
+			.strength-card,
+			.project-card,
+			.recommendation-card,
+			.experience-item,
+			.metric,
+			.credential-item {
 				border: 1px solid rgb(var(--gray-light));
-				border-radius: 16px;
+				border-radius: 8px;
 				background: rgba(var(--gray-light), 0.14);
+			}
+
+			.strength-card,
+			.recommendation-card {
+				padding: 1.15rem;
+			}
+
+			.project-card {
+				padding: 0;
+				overflow: hidden;
+				display: flex;
+				flex-direction: column;
+			}
+
+			.project-card-image {
+				width: 100%;
+				height: 220px;
+				object-fit: cover;
+				border-bottom: 1px solid rgba(var(--gray-light), 0.3);
+				display: block;
+			}
+
+			.project-card-content {
+				padding: 1.15rem;
+				display: flex;
+				flex-direction: column;
+				flex-grow: 1;
+			}
+
+			.strength-card h3,
+			.project-card h3,
+			.recommendation-card h3,
+			.experience-item h3 {
+				margin: 0;
+				font-size: 1.12rem;
+				letter-spacing: 0;
+			}
+
+			.strength-card p,
+			.project-card p,
+			.recommendation-card blockquote,
+			.experience-item p,
+			.metric p,
+			.credential-item {
+				color: rgb(var(--gray));
+				font-size: 0.95rem;
+				line-height: 1.58;
+			}
+
+			.strength-card p,
+			.project-card p,
+			.experience-item p,
+			.metric p {
+				margin: 0.5rem 0 0;
+			}
+
+			.project-header {
+				display: flex;
+				align-items: center;
+				flex-wrap: nowrap;
+				gap: 0.8rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.project-links {
+				display: flex;
+				gap: 0.4rem;
+			}
+
+			.project-card a.project-link-button {
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 6px;
+				background: rgba(var(--gray-light), 0.15);
+				color: rgb(var(--gray-dark));
+				font-size: 0.72rem;
+				font-weight: 700;
+				padding: 0.35rem 0.5rem;
+				text-decoration: none;
+				text-transform: uppercase;
+				letter-spacing: 0.05em;
+				display: inline-flex;
+				align-items: center;
+				white-space: nowrap;
+			}
+
+			.project-card a.project-link-button:hover {
+				border-color: var(--accent);
+				color: var(--accent);
+			}
+
+			.about-copy {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) minmax(280px, 0.52fr);
+				gap: 1rem;
+				align-items: stretch;
+			}
+
+			.metric-grid {
+				display: grid;
+				gap: 0.75rem;
+			}
+
+			.metric {
 				padding: 1rem;
 			}
 
-			.site-note h2 {
-				margin: 0;
-				font-size: 1.25rem;
-				letter-spacing: -0.02em;
+			.metric strong {
+				display: block;
+				color: rgb(var(--black));
+				font-size: 1.55rem;
+				line-height: 1;
 			}
 
-			.site-note p {
+			.metric span {
+				display: block;
+				margin-top: 0.25rem;
+				color: rgb(var(--black));
+				font-size: 0.82rem;
+				font-weight: 700;
+				text-transform: uppercase;
+			}
+
+			.experience-list {
+				display: grid;
+				gap: 1rem;
+			}
+
+			.experience-item {
+				display: grid;
+				grid-template-columns: minmax(170px, 0.28fr) minmax(0, 1fr);
+				gap: 1rem;
+				padding: 1.15rem;
+			}
+
+			.meta {
 				margin: 0;
 				color: rgb(var(--gray));
-				font-size: 0.95rem;
-				line-height: 1.55;
+				font-size: 0.88rem;
+				font-weight: 700;
+				line-height: 1.4;
+			}
+
+			.tag-list {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.45rem;
+				margin: 0.85rem 0 0;
+				padding: 0;
+				list-style: none;
+			}
+
+			.tag-list li {
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 8px;
+				background: rgba(var(--gray-light), 0.22);
+				color: rgb(var(--gray-dark));
+				font-size: 0.78rem;
+				font-weight: 700;
+				line-height: 1;
+				padding: 0.45rem 0.55rem;
+			}
+
+			.project-status {
+				display: inline-flex;
+				margin-bottom: 0.65rem;
+				color: var(--accent);
+				font-size: 0.78rem;
+				font-weight: 700;
+				text-transform: uppercase;
+			}
+
+			.recommendation-card blockquote {
+				margin: 0.75rem 0 1rem;
+				padding: 0;
+				border: 0;
+				font-size: 0.98rem;
+			}
+
+			.recommendation-card a,
+			.project-card a {
+				color: rgb(var(--black));
+				font-weight: 700;
+				text-decoration: none;
+			}
+
+			.recommendation-card a:hover,
+			.project-card a:hover {
+				color: var(--accent);
+			}
+
+			.credential-list {
+				display: grid;
+				grid-template-columns: repeat(3, minmax(0, 1fr));
+				gap: 1rem;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+			}
+
+			.credential-item {
+				padding: 1rem;
+			}
+
+			.contact-panel {
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) auto;
+				gap: 1.5rem;
+				align-items: center;
+				margin-top: 4.5rem;
+				padding: 1.5rem;
+				border: 1px solid rgb(var(--gray-light));
+				border-radius: 8px;
+				background: rgba(var(--gray-light), 0.16);
+			}
+
+			.contact-actions {
+				display: flex;
+				flex-direction: column;
+				gap: 0.65rem;
+				min-width: 12rem;
+			}
+
+			.view-all-link {
+				display: inline-flex;
+				margin-top: 1rem;
+				font-size: 0.94rem;
+				font-weight: 700;
+				text-decoration: none;
 			}
 
 			@media (max-width: 860px) {
@@ -354,9 +786,27 @@ const homeSchema = {
 					padding: 1.25rem;
 				}
 
+				h1 {
+					font-size: 2.45rem;
+				}
+
 				.signal-row,
-				.site-note {
+				.section-heading,
+				.about-copy,
+				.experience-item,
+				.credential-list,
+				.contact-panel {
 					grid-template-columns: 1fr;
+				}
+
+				.strength-grid,
+				.project-grid,
+				.recommendation-grid {
+					grid-template-columns: 1fr;
+				}
+
+				.contact-actions {
+					width: 100%;
 				}
 			}
 		</style>
@@ -382,7 +832,12 @@ const homeSchema = {
 							<a class="button primary" href="/blog/"
 								>Explore the blog</a
 							>
-							<a class="button" href="/about/">Know the person</a>
+							<a
+								class="button"
+								href={calendlyUrl}
+								target="_blank"
+								rel="noopener noreferrer">Book a call</a
+							>
 						</div>
 						<div class="signal-row" aria-label="Site highlights">
 							<div class="signal">
@@ -412,13 +867,12 @@ const homeSchema = {
 					<aside class="hero-card" aria-label="Current profile">
 						<div>
 							<div class="profile-strip">
-								<Image
+								<img
 									class="avatar"
-									src={profileImage}
+									src={profileImage.src}
 									alt="Abhigyan Mohanta"
-									width={84}
-									height={84}
-									densities={[1.5, 2]}
+									width="84"
+									height="84"
 								/>
 								<div>
 									<h2>Abhigyan Mohanta</h2>
@@ -438,8 +892,9 @@ const homeSchema = {
 						<div class="card-section">
 							<strong>Current focus</strong>
 							<p>
-								Kubernetes scheduling, Go Concurrency, and AI
-								infrastructure.
+								Kubernetes scheduling, AI infrastructure,
+								real-time collaboration systems, and backend
+								architecture.
 							</p>
 						</div>
 						<ul class="profile-links" aria-label="Profile links">
@@ -464,6 +919,205 @@ const homeSchema = {
 			<ul class="topic-strip" aria-label="Topics">
 				{currentSignals.map((signal) => <li>{signal}</li>)}
 			</ul>
+
+			<section class="section-block" aria-labelledby="strengths-title">
+				<div class="section-heading">
+					<p class="section-kicker">01 Core Expertise</p>
+					<div>
+						<h2 id="strengths-title">
+							Systems engineering with product momentum.
+						</h2>
+						<p>
+							I like work where the fullstack, platform, and AI
+							pieces have to meet reality: latency, failure, cost,
+							team velocity, and users who need the thing to
+							actually run.
+						</p>
+					</div>
+				</div>
+				<div class="strength-grid">
+					{
+						strengths.map((item) => (
+							<article class="strength-card">
+								<h3>{item.title}</h3>
+								<p>{item.body}</p>
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+			<section class="section-block" aria-labelledby="experience-title">
+				<div class="section-heading">
+					<p class="section-kicker">02 Industry Experience</p>
+					<div>
+						<h2 id="experience-title">
+							From AI collaboration rooms to social product
+							infrastructure.
+						</h2>
+					</div>
+				</div>
+				<div class="experience-list">
+					{
+						experiences.map((item) => (
+							<article class="experience-item">
+								<div>
+									<h3>{item.company}</h3>
+									<p class="meta">
+										{item.role}
+										<br />
+										{item.period}
+										<br />
+										{item.location}
+									</p>
+								</div>
+								<div>
+									<p set:html={item.body} />
+									<ul class="tag-list">
+										{item.tags.map((tag) => (
+											<li>{tag}</li>
+										))}
+									</ul>
+								</div>
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+			<section class="section-block" aria-labelledby="projects-title">
+				<div class="section-heading">
+					<p class="section-kicker">03 Selected projects</p>
+					<div>
+						<h2 id="projects-title">
+							Research-shaped, product-minded, and built to be
+							tested.
+						</h2>
+					</div>
+				</div>
+				<div class="project-grid">
+					{
+						projects.map((item) => (
+							<article class="project-card">
+								{item.image && (
+									<img
+										src={item.image}
+										alt={item.name}
+										class="project-card-image"
+										loading="lazy"
+									/>
+								)}
+								<div class="project-card-content">
+									<span class="project-status">
+										{item.status}
+									</span>
+									<div class="project-header">
+										<h3>{item.name}</h3>
+										{item.links &&
+											item.links.length > 0 && (
+												<div class="project-links">
+													{item.links.map((link) => (
+														<a
+															href={link.href}
+															target="_blank"
+															rel="noopener noreferrer"
+															class="project-link-button"
+														>
+															{link.label}
+														</a>
+													))}
+												</div>
+											)}
+									</div>
+									<p>{item.body}</p>
+									<ul class="tag-list">
+										{item.tags.map((tag) => (
+											<li>{tag}</li>
+										))}
+									</ul>
+								</div>
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+			<section
+				class="section-block"
+				aria-labelledby="recommendations-title"
+			>
+				<div class="section-heading">
+					<p class="section-kicker">04 Recommendations</p>
+					<div>
+						<h2 id="recommendations-title">
+							What managers say about working with me.
+						</h2>
+						<p>
+							These are pulled from recommendations on my LinkedIn
+							profile, with each recommender linked directly.
+						</p>
+						<a
+							class="view-all-link"
+							href={recommendationsUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							>View all LinkedIn recommendations</a
+						>
+					</div>
+				</div>
+				<div class="recommendation-grid">
+					{
+						recommendations.map((item) => (
+							<article class="recommendation-card">
+								<h3>
+									<a
+										href={item.href}
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{item.name}
+									</a>
+								</h3>
+								<p class="meta">
+									{item.role}
+									<br />
+									{item.date} - {item.relationship}
+								</p>
+								<blockquote>{item.quote}</blockquote>
+							</article>
+						))
+					}
+				</div>
+			</section>
+
+			<section class="contact-panel" aria-labelledby="contact-title">
+				<div>
+					<p class="section-kicker">05 Let's talk</p>
+					<h2 id="contact-title">
+						Have a system to build, scale, or debug?
+					</h2>
+					<p>
+						Book a 30-minute call if you want to talk through
+						cloud-native infrastructure, AI product engineering, and
+						architecture. I also love geeking out on industry trends
+						and best practices. Feel free to reach out!
+					</p>
+				</div>
+				<div class="contact-actions">
+					<a
+						class="button primary"
+						href={calendlyUrl}
+						target="_blank"
+						rel="noopener noreferrer">Book a call</a
+					>
+					<a
+						class="button"
+						href="https://www.linkedin.com/in/abhigyan-mohanta/"
+						target="_blank"
+						rel="noopener noreferrer">Connect on LinkedIn</a
+					>
+				</div>
+			</section>
 		</main>
 		<Footer />
 	</body>

@@ -1,0 +1,253 @@
+---
+title: 'Building Reliable Data Systems, Part 4: Batch, Streams, and Dataflow'
+description: 'Field notes from DDIA on batch processing, stream processing, change data capture, derived data, and responsible system design.'
+pubDate: '2025-09-11T12:00:00Z'
+updatedDate: '2026-06-23T12:00:00Z'
+tags: ['Data Engineering', 'Batch Processing', 'Stream Processing', 'Dataflow', 'DDIA']
+heroImage: '../../assets/reliable-data-systems-part-4.jpg'
+---
+
+
+
+The first three parts looked at data models, storage, replication, partitioning, transactions, and correctness under failure.
+
+The final part shifts perspective. Instead of thinking only about databases that answer queries, DDIA asks us to think about data moving through systems.
+
+Modern applications are built from dataflows: source-of-truth databases, search indexes, caches, warehouses, streams, materialized views, and analytics pipelines all connected by transformations.
+
+<div className="article-callout">
+	<p>Part 4 is about data as flow. The theme: reliable systems are not just where data is stored, but how derived state is built, repaired, replayed, and governed.</p>
+</div>
+
+## Batch Processing Handles Bounded Data
+
+Batch processing reads a finite input, computes derived output, and finishes.
+
+Examples:
+
+- Process yesterday's logs.
+- Build a search index from a database snapshot.
+- Generate a daily report.
+- Train a model from historical data.
+
+Batch jobs are powerful because the input is bounded and often immutable. If a task fails, the framework can retry it. If partial output is bad, it can be discarded.
+
+This makes correctness easier than in an always-running online service.
+
+## Unix Philosophy Scales Further Than It Looks
+
+DDIA connects batch processing back to Unix tools.
+
+The Unix style is:
+
+- Read input.
+- Produce output.
+- Avoid mutating the input.
+- Compose small tools through files and pipes.
+
+MapReduce carried this philosophy into distributed datasets.
+
+| Idea | Unix | MapReduce/Dataflow |
+|---|---|---|
+| Input | Files and pipes | Distributed filesystems and datasets |
+| Composition | Output feeds another tool | Jobs feed later jobs |
+| Fault handling | Rerun the command | Retry failed tasks |
+| Data movement | Stream through pipes | Shuffle and partition by key |
+
+Modern dataflow engines improve on MapReduce by keeping more data in memory and avoiding unnecessary disk writes, but the core structure remains: transform immutable input into derived output.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> batch processing is reliable because bounded, immutable input makes retry and recomputation practical.</p>
+
+## Joins Are Data Movement Problems
+
+At scale, joins are not just relational algebra. They are about getting related records onto the same worker.
+
+| Join Strategy | How It Works | Strong Fit |
+|---|---|---|
+| Sort-merge join | Partition and sort inputs, then merge | Large datasets |
+| Broadcast hash join | Send the small dataset to every worker | One small input, one large input |
+| Partitioned hash join | Partition both inputs the same way | Large inputs with matching keys |
+
+The pattern should feel familiar from partitioning: group related data by key, then compute locally.
+
+Batch frameworks can make this reliable because mappers and reducers are ideally deterministic and free of external side effects. If a task fails, the system reruns it and pretends the failed attempt never happened.
+
+## Streams Handle Unbounded Data
+
+Stream processing is like batch processing with no natural end.
+
+Examples:
+
+- User activity events.
+- Payment events.
+- Sensor readings.
+- Application logs.
+- Database change events.
+
+In stream systems, message brokers and logs play the role that filesystems play in batch systems.
+
+| Messaging Model | Behavior | Strong Fit |
+|---|---|---|
+| Task queue | Deliver, acknowledge, delete | Async work distribution |
+| Log-based broker | Append to partitions, consume by offset | Replayable streams and derived state |
+
+Log-based systems such as Kafka are important because they preserve history for some period of time. Consumers track offsets, and data can be replayed.
+
+Replay is a major architectural advantage. It lets teams rebuild derived state after code changes, failures, or new product requirements.
+
+## Databases Can Be Seen As Streams
+
+Every database write is an event.
+
+Change Data Capture, or CDC, exposes that event stream so other systems can consume it. Event sourcing goes further by making the event log the source of truth and deriving current state from it.
+
+This pattern helps keep systems integrated:
+
+| Source Event | Derived System |
+|---|---|
+| Product updated | Search index refresh |
+| Order placed | Revenue dashboard |
+| User action emitted | Recommendation model |
+| Database row changed | Cache or materialized view update |
+
+This is the practical dataflow mindset: one system records facts, other systems derive specialized views.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> logs turn change into something replayable, which makes derived systems easier to rebuild and evolve.</p>
+
+## Time Is Harder In Streams
+
+Batch jobs often process known historical data. Streams process events as they arrive, and arrival order may not match reality.
+
+| Time Type | Meaning |
+|---|---|
+| Processing time | When the system observes the event |
+| Event time | When the event actually happened |
+
+Late events complicate windowed aggregations.
+
+If you compute page views per minute, what should happen when an event arrives five minutes late?
+
+Possible policies include:
+
+- Wait for late events up to a threshold.
+- Update old results when late events arrive.
+- Drop events that are too late.
+- Emit corrections downstream.
+
+There is no universal answer. The product decides how much lateness is acceptable and how visible corrections should be.
+
+## Stream Joins Create Live Derived Views
+
+Streams can be joined, but the semantics depend on what is being joined.
+
+| Join Type | Example |
+|---|---|
+| Stream-stream join | Match click and impression events within a window |
+| Stream-table join | Enrich an event with current user profile data |
+| Table-table join | Combine two changelogs into a live materialized view |
+
+These joins make real-time systems possible, but they also require clear policies around time, ordering, state retention, and fault recovery.
+
+## Fault Tolerance Means Effective-Once Results
+
+Stream processors run forever, so failure recovery must be incremental.
+
+Common techniques include:
+
+- Checkpointing.
+- Microbatching.
+- Idempotent writes.
+- Transactional sinks.
+- Offset tracking.
+
+"Exactly once" is often a shorthand. The practical goal is effective-once externally visible results: after retries and failures, the final outcome should be as if each event was processed once.
+
+That requires cooperation between the stream processor, source, sink, and application logic.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> stream correctness is not one feature. It is the result of replay, checkpointing, idempotence, and sink semantics working together.</p>
+
+## Derived Data Is The Shape Of Modern Systems
+
+Most serious applications do not rely on one database to serve every use case.
+
+They compose specialized systems:
+
+- OLTP databases.
+- Search indexes.
+- Caches.
+- Data warehouses.
+- Batch processors.
+- Stream processors.
+- Message brokers.
+- Machine learning pipelines.
+
+The system of record stores the authoritative facts. Derived systems reshape those facts for access patterns the source of truth should not handle directly.
+
+| System Of Record | Derived Data |
+|---|---|
+| Orders database | Revenue dashboard |
+| Product database | Search index |
+| User events | Recommendation model |
+| Application logs | Alerting metrics |
+
+The best property of derived data is rebuildability. If the source is retained, the derived view can be regenerated after bugs, schema changes, or new requirements.
+
+## Observing Derived State
+
+The dataflow idea does not stop at backend systems. UIs can also observe derived state.
+
+Instead of treating the application as request/response only, a system can let clients subscribe to changes, update live views, support offline work, and recover by replaying state changes.
+
+This is the same mental model at a different layer: source data changes, derived views update, and consumers observe the result.
+
+## Correctness Without Heavy Coordination
+
+DDIA ends by looking beyond distributed transactions.
+
+Many systems avoid heavyweight coordination by using:
+
+- Idempotent operation IDs.
+- Retry-safe writes.
+- Asynchronous constraint checks.
+- Audits and reconciliation.
+- Compensating actions.
+
+This is not giving up on correctness. It is choosing correctness mechanisms that fit distributed reality.
+
+Some operations need synchronous coordination. Others can proceed optimistically and repair rare conflicts later. Senior engineering judgment is knowing which path the product can tolerate.
+
+Audits matter here. Integrity checks, reconciliation jobs, and anomaly detection can catch corruption or missed constraints after the fact. That "trust, but verify" mindset is a practical complement to weaker coordination.
+
+## Data Systems Are Human Systems
+
+The final DDIA chapter also talks about responsibility.
+
+Data systems can empower people, but they can also create harm through surveillance, discrimination, privacy loss, security failures, predictive systems that reinforce bias, bad incentives, and unintended consequences.
+
+Engineers are not only moving bytes. We are building systems that shape decisions, access, opportunity, and trust.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> reliable data systems must be technically correct and socially responsible. Both are part of the job.</p>
+
+## What I'd Remember In Practice
+
+- Batch works well when input is bounded, immutable, and retryable.
+- Large joins are really partitioning and data movement problems.
+- Logs make streams replayable and derived state rebuildable.
+- CDC turns database writes into integration events.
+- Event time and processing time are different design axes.
+- Effective-once results require idempotence and sink cooperation.
+- Derived data is how modern systems serve multiple access patterns.
+- Correctness can come from coordination, idempotence, audits, or repair.
+- Live applications can be designed around observed dataflow, not only request/response.
+- Data systems affect people, not just infrastructure.
+
+<nav className="article-series-nav">
+	<a className="nav-prev" href="/blog/reliable-data-systems-correctness-under-failure/">
+		<span className="nav-label">Previous</span>
+		<span className="nav-title">« Correctness Under Failure</span>
+	</a>
+	<a className="nav-next" href="/blog">
+		<span className="nav-label">Finish</span>
+		<span className="nav-title">Back to All Articles »</span>
+	</a>
+</nav>

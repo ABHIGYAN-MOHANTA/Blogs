@@ -1,0 +1,201 @@
+---
+title: 'Building Reliable Data Systems, Part 2: Replication, Partitioning, and Transactions'
+description: 'Field notes from DDIA on scaling data across machines with replication, partitioning, and transaction semantics.'
+pubDate: '2025-09-09T12:00:00Z'
+updatedDate: '2026-06-23T12:00:00Z'
+tags: ['Distributed Systems', 'Databases', 'Replication', 'Partitioning', 'Transactions', 'DDIA']
+heroImage: '../../assets/reliable-data-systems-part-2.jpg'
+---
+
+
+
+Part 1 looked at data on one machine. Part 2 asks what changes when one machine is not enough.
+
+Distribution gives us availability, lower latency, and scale. It also gives us replication lag, conflicts, hot partitions, routing complexity, and transaction anomalies.
+
+This is the part of *Designing Data-Intensive Applications* where databases stop looking like storage engines and start looking like distributed systems.
+
+<div className="article-callout">
+	<p>Part 2 is about scaling data across machines. The theme: replication and partitioning buy availability and scale, while transactions define how much correctness the application can safely assume.</p>
+</div>
+
+## Replication Buys Resilience And Proximity
+
+Replication means keeping copies of data on multiple machines.
+
+We replicate for several reasons:
+
+- Availability: survive machine or datacenter failures.
+- Latency: keep data close to users.
+- Read scalability: serve reads from multiple replicas.
+- Disconnected operation: continue during network interruptions.
+
+The hard question is not "can we copy data?" It is "what happens when copies disagree?"
+
+| Strategy | How It Works | Main Trade-off |
+|---|---|---|
+| Single-leader | One node accepts writes; followers replicate | Simple writes, potentially stale reads |
+| Multi-leader | Multiple leaders accept writes | Better regional writes, conflict handling required |
+| Leaderless | Clients read/write several replicas | High fault tolerance, more complex consistency |
+
+Single-leader replication is easiest to reason about. Writes go to one place. Followers copy from it. The common cost is stale reads from replicas.
+
+Multi-leader replication is attractive for multi-region systems because users can write to a nearby region. The cost is conflict resolution. Two leaders can accept incompatible writes before they hear from each other.
+
+Leaderless systems push coordination to clients and quorums. They can tolerate failures well, but reads and writes now have to reason about multiple versions.
+
+Leaderless replication often uses quorum-style reads and writes: write to several replicas, read from several replicas, and compare versions. This improves fault tolerance, but it is not magic consistency. Sloppy quorums and hinted handoff can keep the system available during failures, but they also weaken the simple mental model that a quorum always means "the same set of replicas agreed."
+
+## Replication Lag Is A Product Problem
+
+Synchronous replication waits for replicas before acknowledging a write. Asynchronous replication acknowledges quickly and lets replicas catch up later.
+
+| Mode | Benefit | Risk |
+|---|---|---|
+| Synchronous | Stronger consistency | Higher latency and lower availability |
+| Asynchronous | Fast writes and better availability | Stale reads or possible data loss |
+
+Most production systems choose a middle ground because fully synchronous replication everywhere is slow, and fully asynchronous replication can surprise users.
+
+Replication lag creates real product bugs:
+
+- A user updates a profile and refreshes into old data.
+- A comment reply appears before the original comment.
+- A user moves between replicas and appears to go backward in time.
+
+DDIA gives names to useful guarantees:
+
+| Guarantee | What It Protects |
+|---|---|
+| Read-your-writes | Users see their own writes |
+| Monotonic reads | Users do not observe time going backward |
+| Consistent prefix | Causal order is preserved |
+
+These are weaker than full linearizability, but often much closer to what users actually need.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> replication lag is not only a database detail. It changes the user experience and the promises the product can make.</p>
+
+## Conflicts Need A Policy
+
+Multi-leader and leaderless systems can accept concurrent writes to the same logical data. Once that happens, the system needs a conflict policy.
+
+| Conflict Strategy | Benefit | Risk |
+|---|---|---|
+| Last write wins | Easy to implement | Can silently lose data |
+| Application merge | Domain-aware | Hard to design correctly |
+| Version vectors | Tracks concurrency | More metadata and complexity |
+| Human resolution | Good for rare semantic conflicts | Does not scale for frequent conflicts |
+
+Last write wins is tempting because it is simple. It is also dangerous because it can throw away data without telling anyone.
+
+Application-defined merge logic can be much better. A shopping cart can merge added items. A collaborative editor needs a deeper strategy. A financial ledger should probably avoid ambiguous concurrent mutation entirely.
+
+Conflict resolution is not an afterthought. It is part of the data model.
+
+## Partitioning Splits The Dataset
+
+Replication copies data. Partitioning divides it.
+
+When data or load outgrows one machine, partitions let different nodes own different slices of the dataset. The goal is to spread storage, reads, writes, and query execution.
+
+| Strategy | Strong Fit | Weakness |
+|---|---|---|
+| Key-range partitioning | Range queries and ordered scans | Hot spots with sequential keys |
+| Hash partitioning | Even load distribution | Poor range queries |
+
+Key-range partitioning keeps nearby keys together. That is excellent for range scans, but dangerous if new writes cluster in one range, such as timestamp-based keys.
+
+Hash partitioning spreads keys evenly. That helps load balance, but destroys ordering. Range queries become expensive because the relevant keys may be scattered everywhere.
+
+Hybrid designs are common. A system might partition by hashed user ID but sort events by timestamp inside each user's partition.
+
+## Secondary Indexes Complicate Distribution
+
+Primary-key partitioning is only the first problem. Real systems also need secondary indexes.
+
+| Index Type | How It Works | Trade-off |
+|---|---|---|
+| Local index | Each partition indexes only its own data | Simple writes, scatter-gather reads |
+| Global index | Index is partitioned by indexed value | Targeted reads, more expensive writes |
+
+Local indexes keep writes simple because the primary partition can update its own index. But a query by secondary attribute may need to ask every partition.
+
+Global indexes make reads more targeted, but writes may touch multiple partitions or require asynchronous index maintenance.
+
+This is a recurring distributed systems pattern: optimizing one path usually makes another path more expensive.
+
+## Rebalancing And Routing Are Operational Concerns
+
+Clusters change. Data grows, nodes fail, and new machines are added.
+
+Rebalancing moves partitions so the cluster remains balanced. Good rebalancing should avoid moving too much data, overloading the system, or breaking routing while requests are still flowing.
+
+Routing then decides how clients find the right partition.
+
+| Routing Strategy | Description |
+|---|---|
+| Request any node | The contacted node forwards to the owner |
+| Routing tier | A partition-aware layer sends requests to the right node |
+| Client-side routing | Clients know the partition map directly |
+
+The more distributed a system gets, the more metadata matters. Partition maps, membership, ownership, and failure detection become part of the system's correctness story.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> partitioning creates scale, but it also creates routing, indexing, and rebalancing work that must be designed explicitly.</p>
+
+## Transactions Define The Correctness Contract
+
+Transactions let application code pretend that a group of reads and writes happens as one unit.
+
+The familiar ACID properties are:
+
+| Property | Meaning |
+|---|---|
+| Atomicity | All writes happen, or none do |
+| Consistency | Application-defined invariants are preserved |
+| Isolation | Concurrent transactions do not interfere unexpectedly |
+| Durability | Committed data survives crashes |
+
+Isolation is the property that causes the most surprises.
+
+| Isolation Level | Guarantee | Still To Watch |
+|---|---|---|
+| Read committed | Prevents dirty reads and dirty writes | Non-repeatable reads |
+| Snapshot isolation | Gives each transaction a consistent snapshot | Write skew and some phantoms |
+| Serializable | Behaves as if transactions ran one at a time | Usually more coordination cost |
+
+Read committed is common and useful, but it does not make a transaction see a stable snapshot.
+
+Snapshot isolation gives each transaction a consistent view of the database, often using MVCC. This is excellent for read-heavy workloads because readers and writers do not block each other as much.
+
+But snapshot isolation is not serializability. Write skew can still happen when two transactions read overlapping data, make decisions that look valid independently, and then write different rows that violate a shared invariant.
+
+Serializable isolation is the strongest model. Transactions behave as if they ran one at a time in some order, which is why it rules out anomalies such as lost updates, write skew, and phantoms when implemented correctly.
+
+| Serializable Strategy | Idea | Cost |
+|---|---|---|
+| Actual serial execution | Run transactions one at a time | Limited throughput per execution lane |
+| Two-phase locking | Block conflicting reads/writes | Contention and deadlocks |
+| Serializable snapshot isolation | Run optimistically, abort unsafe commits | Retries and conflict detection |
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> weak isolation prevents some bugs, not all bugs. Know which anomalies your database allows before relying on it for invariants.</p>
+
+## What I'd Remember In Practice
+
+- Replication improves availability and latency, but creates stale reads and conflicts.
+- Product semantics should drive consistency guarantees, not database defaults.
+- Conflict resolution is part of the data model.
+- Partitioning scales load, but secondary indexes and routing become harder.
+- Rebalancing is an operational feature, not just a background chore.
+- Transactions are only as safe as their isolation level.
+- Serializable isolation is the clean correctness model, but it has real coordination cost.
+
+<nav className="article-series-nav">
+	<a className="nav-prev" href="/blog/reliable-data-systems-models-storage-evolution/">
+		<span className="nav-label">Previous</span>
+		<span className="nav-title">« Models, Storage, and Evolution</span>
+	</a>
+	<a className="nav-next" href="/blog/reliable-data-systems-correctness-under-failure/">
+		<span className="nav-label">Next</span>
+		<span className="nav-title">Correctness Under Failure »</span>
+	</a>
+</nav>

@@ -1,0 +1,180 @@
+---
+title: 'Building Reliable Data Systems, Part 1: Models, Storage, and Evolution'
+description: 'Field notes from DDIA on how data models, indexes, storage engines, and encoding choices shape backend systems.'
+pubDate: '2025-09-08T12:00:00Z'
+updatedDate: '2026-06-23T12:00:00Z'
+tags: ['Data Systems', 'Databases', 'Storage Engines', 'System Design', 'DDIA']
+heroImage: '../../assets/reliable-data-systems-part-1.jpg'
+---
+
+
+
+In August 2025, I read *Designing Data-Intensive Applications* by Martin Kleppmann in public and wrote short notes as I went.
+
+This series is the cleaned-up version of those field notes. It is not trying to retell the whole book. It is trying to preserve the engineering judgment DDIA builds: how to reason about trade-offs in real backend and data systems.
+
+This first part starts before distribution. Before we replicate data, partition it, or run consensus, we need to understand the baseline DDIA sets up for data systems:
+
+- What reliability, scalability, and maintainability actually mean.
+- How the application represents data.
+- How the database stores and retrieves it.
+- How data survives schema and code evolution.
+
+<div className="article-callout">
+	<p>Part 1 is about the shape of data on one machine. The theme is simple: data models, indexes, storage engines, and encodings are product decisions disguised as implementation details.</p>
+</div>
+
+## The Baseline: Reliable, Scalable, Maintainable
+
+DDIA starts by naming the three qualities that make data systems worth trusting over time.
+
+| Quality | Practical Meaning | Typical Failure Mode |
+|---|---|---|
+| Reliability | The system keeps working correctly when things go wrong | Faults turn into user-visible failures |
+| Scalability | The system continues to perform as load grows | More traffic or data creates nonlinear pain |
+| Maintainability | Engineers can operate, understand, and evolve the system | Complexity slows every future change |
+
+Reliability is not the same as "nothing ever breaks." Hardware fails, software has bugs, and humans make mistakes. A reliable system expects faults and prevents them from becoming failures.
+
+Scalability is not a single metric. You first describe load, then describe performance under that load, and only then decide how to cope with growth.
+
+Maintainability is the long game. Operability, simplicity, and evolvability determine whether future engineers can safely keep changing the system.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> DDIA is not about choosing fashionable databases. It is about making data systems reliable, scalable, and maintainable under real operational pressure.</p>
+
+## Data Models Are Architecture
+
+The first major design decision in a data system is not the database brand. It is the data model.
+
+A data model decides what is natural to express, what becomes awkward, which queries are cheap, and how painful future change will be. DDIA makes this clear by comparing relational, document, and graph models.
+
+| Model | Strong Fit | Engineering Cost |
+|---|---|---|
+| Relational | Joins, constraints, ad hoc querying | Can feel rigid for deeply nested or variable data |
+| Document | Locality, nested data, flexible shapes | Joins and many-to-many relationships get harder |
+| Graph | Highly connected domains | More specialized tooling and operations |
+
+Relational databases are strong because they separate the logical question from the physical execution. SQL lets you describe what you want, and the database can choose indexes, join orders, and execution strategies.
+
+Document databases often feel closer to application objects. Keeping related nested data in one document can make reads fast and code straightforward when the document is the natural unit of access.
+
+But locality cuts both ways. A document model is elegant when data is usually read together. It becomes awkward when relationships cross document boundaries or when many different query shapes appear.
+
+Graph databases take relationships seriously. They shine when the central question is not "what rows match this filter?" but "what is connected to what?" Social graphs, fraud detection, recommendations, dependency graphs, and knowledge graphs all fit this shape.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> choose a data model from access patterns and domain relationships, not from database fashion.</p>
+
+## Schema Is A Deployment Strategy
+
+DDIA's schema-on-write vs schema-on-read distinction is really about where you want failure to appear.
+
+| Approach | Where Structure Is Enforced | What You Get |
+|---|---|---|
+| Schema-on-write | Before data is stored | Safety, consistency, earlier failure |
+| Schema-on-read | When data is interpreted | Flexibility, faster ingestion, later failure |
+
+Schema-on-write rejects bad data early. That is valuable when the data is shared across teams, used for money movement, or drives important user-visible workflows.
+
+Schema-on-read allows messy or evolving data to land first and be interpreted later. That can be useful for logs, analytics, migrations, or rapidly changing product surfaces.
+
+The trap is thinking schema-on-read removes schema work. It does not. It moves that work into application logic, query code, migration scripts, dashboards, and human discipline.
+
+The SQL vs NoSQL boundary is also blurrier than it sounds. SQL databases added JSON support. Document databases added aggregation pipelines and richer query languages. Real systems borrow ideas from both sides because real data rarely stays pure.
+
+## Query Languages Shape Engineering Velocity
+
+Declarative query languages are one of the biggest productivity wins in data systems.
+
+| Style | You Specify | Examples |
+|---|---|---|
+| Declarative | What result you want | SQL, Cypher |
+| Imperative | How to compute it | MapReduce-style code, manual loops |
+
+Declarative systems give the optimizer room to work. The database can reorder joins, pick indexes, parallelize execution, and improve performance without changing application code.
+
+Imperative systems can be flexible, but they push more operational detail onto the engineer. Sometimes that control is necessary. But as a default, declarative interfaces make systems easier to evolve.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> a good query language is not syntax sugar. It is an abstraction boundary between product logic and execution strategy.</p>
+
+## Indexes Are Derived Data
+
+An index is extra structure maintained to make reads faster.
+
+That means every index is a trade-off:
+
+- Reads get faster.
+- Writes get slower.
+- Storage cost increases.
+- Operational maintenance increases.
+
+This pattern repeats throughout DDIA. Derived data is useful because it creates a better access path. But it always has to be kept in sync with the source of truth.
+
+Hash indexes are simple and effective for key-value lookups. They map keys to byte offsets. But because they do not preserve order, they are poor for range queries.
+
+Sorted structures solve a different problem. If keys are ordered, range scans become efficient. That leads to two important storage engine families: LSM trees and B-trees.
+
+## Storage Engines Define System Behavior
+
+Storage engines are not trivia hidden below the application. They shape latency, throughput, write amplification, read amplification, compaction behavior, and operational surprises.
+
+| Storage Engine | Strong Fit | Trade-off |
+|---|---|---|
+| B-tree | Balanced read/write workloads, mature OLTP systems | Random writes and page management |
+| LSM tree | High write throughput and sequential writes | Read amplification and compaction overhead |
+| Column store | Analytical scans and compression | Not ideal for small transactional updates |
+
+B-trees keep data sorted in pages and update those pages in place. They are mature and widely used in traditional relational databases.
+
+LSM-tree engines write to memory first, flush sorted immutable files to disk, and merge them later through compaction. This is excellent for write-heavy workloads because writes are mostly sequential. The cost shows up in reads and background compaction.
+
+Column stores attack a different workload. Analytical queries often scan a few columns over many rows. If a query needs only `country`, `created_at`, and `revenue`, a column store can read exactly those columns, compress them aggressively, and skip the rest.
+
+That is the difference between OLTP and OLAP:
+
+| Workload | Access Pattern | Common Storage Shape |
+|---|---|---|
+| OLTP | Many small reads and writes | Row-oriented storage |
+| OLAP | Large scans and aggregations | Column-oriented storage |
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> the storage engine decides which workload feels natural and which workload fights the system.</p>
+
+## Encoding Is How Systems Survive Change
+
+Data does not only sit in a database. It moves between services, brokers, clients, files, and different versions of the same application.
+
+That means data structures must become bytes and then become data structures again. The encoding choice affects performance, compatibility, debugging, and deployment safety.
+
+Rolling deployments make this especially important. For a period of time, old code and new code run together. The data format must tolerate that mixed world.
+
+| Compatibility Type | Meaning |
+|---|---|
+| Backward compatibility | New code can read old data |
+| Forward compatibility | Old code can tolerate new data |
+
+Without compatibility, deploys become fragile and rollbacks become scary.
+
+| Format Family | Examples | Strong Fit | Weakness |
+|---|---|---|---|
+| Language-specific | Java serialization, Python pickle | Quick internal use | Brittle, unsafe, language-locked |
+| Textual | JSON, XML, CSV | Debugging and flexibility | Larger payloads, weaker typing |
+| Binary schema-driven | Avro, Protobuf, Thrift | Compact and evolution-friendly | Requires schema discipline |
+
+JSON is useful early because humans can inspect it easily. Schema-driven formats become valuable when payload size, team boundaries, and long-term compatibility matter more.
+
+<p className="article-takeaway"><strong>Engineering takeaway:</strong> storage engines decide how data lives; encodings decide how data moves through time.</p>
+
+## What I'd Remember In Practice
+
+- Pick the data model from the dominant relationships and access paths.
+- Treat schema flexibility as a trade-off, not a free advantage.
+- Prefer declarative interfaces when the system can optimize better than application code.
+- Remember that indexes are derived data with write and maintenance cost.
+- Match B-trees, LSM trees, and column stores to workload shape.
+- Design encodings for rolling deploys, not just for today's payload.
+
+<nav className="article-series-nav">
+	<a className="nav-next" href="/blog/reliable-data-systems-replication-partitioning-transactions/">
+		<span className="nav-label">Next</span>
+		<span className="nav-title">Replication, Partitioning, and Transactions »</span>
+	</a>
+</nav>
