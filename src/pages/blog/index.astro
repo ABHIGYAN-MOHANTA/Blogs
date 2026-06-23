@@ -157,12 +157,14 @@ const collectionSchema = {
 								<a href={`/blog/${post.id}/`}>
 									{post.data.heroImage && (
 										<Image
-											width="720"
-											height="480"
+											width={720}
+											height={480}
 											src={post.data.heroImage}
 											alt={post.data.title}
 											loading="lazy"
 											decoding="async"
+											quality="high"
+											densities={[1.5, 2]}
 										/>
 									)}
 									<h4 class="title">{post.data.title}</h4>
