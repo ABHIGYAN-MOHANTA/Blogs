@@ -3,7 +3,7 @@
 // all pages through the use of the <BaseHead /> component.
 import "../styles/global.css";
 import type { ImageMetadata } from "astro";
-import FallbackImage from "../assets/blog-placeholder-1.jpg";
+import FallbackImage from "../assets/about-cover.jpeg";
 import {
 	SITE_TITLE,
 	SITE_DESCRIPTION,
@@ -147,8 +147,12 @@ const articleSchema =
 				/>
 			)}
 			<meta property="article:author" content={author} />
-			{tags.length > 0 && <meta property="article:section" content={tags[0]} />}
-			{tags.map((tag) => <meta property="article:tag" content={tag} />)}
+			{tags.length > 0 && (
+				<meta property="article:section" content={tags[0]} />
+			)}
+			{tags.map((tag) => (
+				<meta property="article:tag" content={tag} />
+			))}
 		</>
 	)
 }
