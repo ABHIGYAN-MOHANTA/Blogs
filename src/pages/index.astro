@@ -96,9 +96,9 @@ const experiences = [
 	},
 ];
 
-const projects = [
+const publications = [
 	{
-		name: "AdmiRL",
+		name: "AdmiRL: Learning-Augmented Admission Control for Gang and Elastic GPU Workloads in Kueue",
 		image: "/admirl.png",
 		links: [
 			{
@@ -106,10 +106,32 @@ const projects = [
 				href: "https://github.com/ABHIGYAN-MOHANTA/AdmiRL",
 			},
 		],
-		status: "Research",
-		body: "A learning-augmented admission control system for gang and elastic GPU workloads in Kueue. It combines cohort-aware gang protection with PPO-based, topology-aware elastic flavor ranking.",
-		tags: ["Python", "PyTorch", "Kubernetes", "Kueue", "RL"],
+		status: "Accepted at IC-SIT 2026 (IEEE)",
+		body: "As AI models scale, infrastructure becomes the bottleneck. This paper proposes a reinforcement learning approach for admission control in Kubernetes using Kueue to improve GPU utilization and reduce wait times for large-scale AI workloads. Co-authored with Saswat Sankalp Parida, Rakesh Kumar Parida, and Smruti Sikha Dash, under the guidance of Dr. Barnali Sahu.",
+		tags: [
+			"Research",
+			"Kubernetes",
+			"Kueue",
+			"AI Infrastructure",
+			"Machine Learning",
+		],
 	},
+	{
+		name: "Kubernetes SIG Scheduling & Kueue",
+		image: "/kueue-combined.png",
+		links: [
+			{
+				label: "GitHub",
+				href: "https://github.com/kubernetes-sigs/kueue/pulls?q=is%3Apr+author%3Aabhigyan-mohanta",
+			},
+		],
+		status: "Open Source Contributor",
+		body: "Active contributor to Kubernetes SIG Scheduling, focusing on the Kueue project and KueueViz. Recent contributions include mitigating DoS vulnerabilities via HTTP and WebSocket safeguards, fortifying secure deployments, resolving dashboard crashes, and enforcing container security best practices.",
+		tags: ["Open Source", "Kubernetes", "Go", "Security", "Infrastructure"],
+	},
+];
+
+const projects = [
 	{
 		name: "Skia Labs",
 		image: "/skialabs.png",
@@ -351,7 +373,11 @@ const homeSchema = {
 				font-size: 4rem;
 				letter-spacing: 0;
 				line-height: 1.05;
-				background: linear-gradient(135deg, rgb(var(--black)) 0%, rgba(var(--black), 0.6) 100%);
+				background: linear-gradient(
+					135deg,
+					rgb(var(--black)) 0%,
+					rgba(var(--black), 0.6) 100%
+				);
 				-webkit-background-clip: text;
 				-webkit-text-fill-color: transparent;
 				background-clip: text;
@@ -545,9 +571,12 @@ const homeSchema = {
 				font-weight: 700;
 				line-height: 1;
 				padding: 0.55rem 0.7rem;
-				transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+				transition:
+					transform 0.25s ease,
+					border-color 0.25s ease,
+					box-shadow 0.25s ease;
 			}
-			
+
 			.topic-strip li:hover {
 				transform: translateY(-2px);
 				border-color: var(--accent);
@@ -609,7 +638,10 @@ const homeSchema = {
 				border: 1px solid rgb(var(--gray-light));
 				border-radius: 8px;
 				background: rgba(var(--gray-light), 0.14);
-				transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+				transition:
+					transform 0.3s ease,
+					border-color 0.3s ease,
+					box-shadow 0.3s ease;
 			}
 
 			.strength-card:hover,
@@ -779,7 +811,10 @@ const homeSchema = {
 				font-weight: 700;
 				line-height: 1;
 				padding: 0.45rem 0.55rem;
-				transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+				transition:
+					transform 0.2s ease,
+					border-color 0.2s ease,
+					box-shadow 0.2s ease;
 			}
 
 			.tag-list li:hover {
@@ -926,7 +961,7 @@ const homeSchema = {
 							<div class="signal">
 								<strong>Open Source Contributor</strong>
 								<span
-									>Contributor to Kubernetes SIG
+									>Active contributor to Kubernetes SIG
 									Scheduling.</span
 								>
 							</div>
@@ -1077,13 +1112,69 @@ const homeSchema = {
 				</div>
 			</section>
 
+			<section class="section-block" aria-labelledby="publications-title">
+				<div class="section-heading">
+					<p class="section-kicker">03 Research & Open Source</p>
+					<div>
+						<h2 id="publications-title">
+							Academic research and core ecosystem contributions.
+						</h2>
+					</div>
+				</div>
+				<div class="project-grid">
+					{
+						publications.map((item) => (
+							<article class="project-card">
+								{item.image && (
+									<img
+										src={item.image}
+										alt={item.name}
+										class="project-card-image"
+										loading="lazy"
+									/>
+								)}
+								<div class="project-card-content">
+									<span class="project-status">
+										{item.status}
+									</span>
+									<div class="project-header">
+										<h3>{item.name}</h3>
+										{item.links &&
+											item.links.length > 0 && (
+												<div class="project-links">
+													{item.links.map((link) => (
+														<a
+															href={link.href}
+															target="_blank"
+															rel="noopener noreferrer"
+															class="project-link-button"
+														>
+															{link.label}
+														</a>
+													))}
+												</div>
+											)}
+									</div>
+									<p>{item.body}</p>
+									<ul class="tag-list">
+										{item.tags.map((tag) => (
+											<li>{tag}</li>
+										))}
+									</ul>
+								</div>
+							</article>
+						))
+					}
+				</div>
+			</section>
+
 			<section class="section-block" aria-labelledby="projects-title">
 				<div class="section-heading">
-					<p class="section-kicker">03 Selected projects</p>
+					<p class="section-kicker">04 Selected projects</p>
 					<div>
 						<h2 id="projects-title">
-							Research-shaped, product-minded, and built to be
-							tested.
+							Open-source tools, interactive systems, and side
+							projects.
 						</h2>
 					</div>
 				</div>
@@ -1139,7 +1230,7 @@ const homeSchema = {
 				aria-labelledby="recommendations-title"
 			>
 				<div class="section-heading">
-					<p class="section-kicker">04 Recommendations</p>
+					<p class="section-kicker">05 Recommendations</p>
 					<div>
 						<h2 id="recommendations-title">
 							What managers say about working with me.
@@ -1184,7 +1275,7 @@ const homeSchema = {
 
 			<section class="contact-panel" aria-labelledby="contact-title">
 				<div>
-					<p class="section-kicker">05 Let's talk</p>
+					<p class="section-kicker">06 Let's talk</p>
 					<h2 id="contact-title">
 						Have a system to build, scale, or debug?
 					</h2>
