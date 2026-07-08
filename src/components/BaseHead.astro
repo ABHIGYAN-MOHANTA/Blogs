@@ -41,7 +41,9 @@ const {
 	tags = [],
 } = Astro.props;
 
-const imageURL = new URL(image.src, Astro.site);
+import { getImage } from "astro:assets";
+const ogImage = await getImage({ src: image, width: 1200, format: 'jpg' });
+const imageURL = new URL(ogImage.src, Astro.site);
 const ogType = article ? "article" : "website";
 const authorSchema = {
 	"@type": "Person",
@@ -127,8 +129,8 @@ const articleSchema =
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:image" content={imageURL} />
-<meta property="og:image:width" content={image.width.toString()} />
-<meta property="og:image:height" content={image.height.toString()} />
+<meta property="og:image:width" content={ogImage.attributes.width.toString()} />
+<meta property="og:image:height" content={ogImage.attributes.height.toString()} />
 <meta property="og:image:alt" content={headline} />
 <meta property="og:site_name" content={SITE_TITLE} />
 <meta property="og:locale" content="en_US" />
