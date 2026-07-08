@@ -1,0 +1,116 @@
+---
+title: 'Mitigating Slowloris in Go: A Deep Dive into HTTP Server Timeouts and WebSockets'
+description: 'How to secure a Go HTTP server against DoS attacks without breaking long-lived WebSocket connections.'
+pubDate: '2026-07-08T12:00:00Z'
+updatedDate: '2026-07-08T12:00:00Z'
+tags: ['Go', 'Kubernetes', 'Security', 'Networking', 'WebSockets']
+heroImage: '../../assets/go-websockets-security.png'
+---
+
+When building HTTP servers in Go, the `net/http` package provides a robust foundation. However, by default, a standard `http.Server` has no timeouts. This exposes your application to a classic Denial of Service (DoS) vulnerability: **Slowloris**.
+
+In a Slowloris attack, a malicious client connects to your server but sends HTTP request headers or body data agonizingly slowly, or stops reading responses entirely. Because Go spawns a new goroutine for every connection, thousands of stalled connections will eventually exhaust the server's goroutines and memory, bringing the system to a halt.
+
+Recently, while contributing to the [KueueViz](https://github.com/kubernetes-sigs/kueue) project (part of Kubernetes SIG Scheduling), we encountered this exact scenario. We needed to secure our REST APIs against connection exhaustion. But there was a catch: KueueViz heavily relies on **WebSockets** for real-time dashboard updates. 
+
+If we apply global timeouts to the HTTP server to prevent Slowloris, wouldn't that instantly kill all our long-lived WebSockets?
+
+Here is a deep dive into the underlying mechanics of `net.Conn`, `http.Server`, and how to safely mix strict REST timeouts with indefinite WebSocket connections.
+
+---
+
+### The First Defense: Global http.Server Timeouts
+
+To prevent a client from holding a connection open forever, you must configure timeouts on your `http.Server`. There are four primary levers:
+
+```go
+server := &http.Server{
+    Addr:              ":8080",
+    Handler:           router,
+    // ReadHeaderTimeout bounds the time to read request headers.
+    ReadHeaderTimeout: 32 * time.Second,
+    // ReadTimeout bounds the time to read the entire request (including body).
+    ReadTimeout:       120 * time.Second,
+    // WriteTimeout bounds the time to write the response.
+    WriteTimeout:      120 * time.Second,
+    // IdleTimeout bounds the time to wait for the next request in keep-alives.
+    IdleTimeout:       90 * time.Second,
+}
+```
+
+By setting these, you ensure that any standard REST API call (like `/api/v1/status`) cannot hang the server indefinitely. If a client takes longer than 120 seconds to read the response, the server forcefully closes the TCP socket.
+
+<div className="article-callout">
+	<p><strong>Industry Standards:</strong> The Kubernetes `apiserver` and `controller-runtime` typically set `ReadHeaderTimeout` to 32s and `IdleTimeout` to 90s, but often skip global `ReadTimeout`/`WriteTimeout` to avoid breaking `kubectl exec` and watches. Other projects like Traefik (60s) and Prometheus (5m) prefer strict global bounds.</p>
+</div>
+
+### The Catch: How Global Timeouts Break WebSockets
+
+Here lies the architectural friction. 
+
+A WebSocket connection starts its life as a standard HTTP `GET` request. Once the server accepts the upgrade, the connection is "hijacked," bypassing the standard HTTP request-response cycle and becoming a raw, bi-directional TCP pipe.
+
+If you set `ReadTimeout: 120 * time.Second` on the `http.Server`, you are telling the server to kill the underlying TCP socket (`net.Conn`) 120 seconds after the connection is accepted. 
+
+The difference between HTTP timeouts and socket deadlines is crucial:
+* `ReadTimeout` / `WriteTimeout` are high-level configuration properties of the Go `http.Server`.
+* `ReadDeadline` / `WriteDeadline` are low-level, absolute timestamps applied directly to the TCP socket (`net.Conn`).
+
+When the `http.Server` accepts a connection, it takes your configured `ReadTimeout` and applies it as a hard socket deadline via `conn.SetReadDeadline(...)`. This means your long-lived WebSockets will inexplicably disconnect every 2 minutes!
+
+### The `gorilla/websocket` Magic
+
+In KueueViz, we decided to use strict 120-second global timeouts to ensure maximum security for our REST endpoints. So, how did our WebSockets survive?
+
+The secret lies inside the popular `gorilla/websocket` library. 
+
+During the HTTP upgrade process, `gorilla/websocket` hijacks the raw TCP connection from the Go HTTP server. Once it has control, it does something brilliant: **it automatically clears any inherited socket deadlines**.
+
+If you peek into the `gorilla/websocket` source code (`server.go`), you'll find:
+
+```go
+// Clear deadlines set by HTTP server.
+netConn.SetDeadline(time.Time{})
+```
+
+By setting the deadline to the zero value `time.Time{}`, it explicitly removes the countdown timer placed by the `http.Server`. 
+
+This is an incredibly powerful architectural pattern: **It allows you to safely set strict global timeouts on your `http.Server` to protect your REST APIs, knowing that your WebSocket library will automatically un-bound hijacked connections.**
+
+### Protecting the WebSockets Themselves
+
+If `gorilla/websocket` removes the deadlines to let the connection live forever, haven't we just reintroduced the Slowloris vulnerability? What happens if a malicious client opens a WebSocket and then stops reading from their socket?
+
+Let's look at the underlying TCP mechanics:
+1. **Client Receive Window:** The server can only send data as fast as the client reads it. If the client stops reading, their TCP "receive window" fills up.
+2. **Server Send Buffer:** Once the client is full, the OS-level TCP send buffer on the server fills up.
+3. **The Block:** When the OS send buffer is full, the Go `write()` system call **blocks**.
+
+Without a deadline, the goroutine attempting to call `conn.WriteMessage()` will block indefinitely. A malicious actor could open 10,000 WebSockets, stop reading, and permanently lock up 10,000 goroutines on your server.
+
+The solution is to establish a **per-message absolute deadline** directly on the underlying socket just before writing:
+
+```go
+const writeDeadlineExtension = 5 * time.Second
+
+func sendData(conn *websocket.Conn, data []byte) error {
+    // Establish a strict absolute deadline on the underlying net.Conn
+    // before sending a WebSocket message.
+    err := conn.SetWriteDeadline(time.Now().Add(writeDeadlineExtension))
+    if err != nil {
+        return err
+    }
+
+    // This ensures that the server does not block indefinitely 
+    // when attempting to write to a slow or unresponsive client.
+    return conn.WriteMessage(websocket.TextMessage, data)
+}
+```
+
+### Conclusion
+
+Securing a Go server requires an understanding of how timeouts propagate from the high-level `http.Server` down to the low-level `net.Conn`. 
+
+By combining global `ReadTimeout`/`WriteTimeout` bounds for REST APIs with localized, per-message `SetWriteDeadline` calls for WebSockets, you can build highly resilient, real-time systems that are immune to connection exhaustion attacks.
+
+*If you want to see this implemented in the wild, check out my recent [KueueViz PR #12590](https://github.com/kubernetes-sigs/kueue/pull/12590) on the Kubernetes SIGs Kueue repository.*
