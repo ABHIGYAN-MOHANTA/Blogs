@@ -1,12 +1,13 @@
 // @ts-check
 
 import mdx from '@astrojs/mdx';
+import mermaid from 'astro-mermaid';
 import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
 	site: 'https://cloudnativeabhigyan.me',
-	integrations: [mdx()],
+	integrations: [mdx(), mermaid()],
 	fonts: [
 		{
 			provider: fontProviders.local(),
