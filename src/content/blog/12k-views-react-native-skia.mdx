@@ -50,11 +50,11 @@ When I shared this on Reddit, I focused on the problem rather than just dropping
 > 
 > I just made the tool completely free and public today. Let me know if anyone wants the link to try it out and I’ll drop it in the comments!
 
-The response was overwhelming because it named a universal pain point and offered a technical architecture shift to solve it. Almost every RN dev has dealt with Lottie performance issues and dropped frames.
+The response was overwhelming because it named a shared pain point and offered a technical architecture shift to solve it. Many developers have run into Lottie performance constraints when pushing the limits of their app's UI.
 
 ## The "AI-to-App" Workflow
 
-In the comments, developers asked for a guide on how I actually use this in practice. Here is the exact workflow that speeds up my UI development 10x:
+In the comments, developers asked for a guide on how I actually use this in practice. Here is the workflow I use to quickly iterate on visual effects:
 
 1. **AI Generation:** Instead of ripping a shader from Shadertoy directly (which introduces massive Creative Commons licensing issues for commercial apps), I use an AI agent equipped with a custom `sksl-shader-writer` skill to generate an *original* procedural effect directly in SKSL. AI excels at this because SKSL is purely mathematical.
 2. **Tweak in Skia Labs:** I drop the AI-generated code into <a href="https://skialabs.dev" target="_blank" rel="noopener noreferrer">Skia Labs</a> to instantly test and tweak the parameters.
