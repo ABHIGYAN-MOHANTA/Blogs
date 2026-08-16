@@ -1,16 +1,16 @@
 ---
-title: 'How My Weekend Project Hit #1 for the Day on r/reactnative with 12k+ Views in 24 Hours'
-description: 'Ditching Lottie for Skia: A deep dive into the technical problem that resonated with the React Native community and the launch strategy that worked.'
+title: 'I built a better workflow for React Native Skia shaders and accidentally hit #1 on r/reactnative with 12K views'
+description: 'Ditching Lottie for Skia: A deep dive into the technical problem that resonated with the React Native community.'
 pubDate: '2026-08-16T12:00:00Z'
 tags: ['React Native', 'Skia', 'Indie Hacking', 'Performance', 'GPU']
 heroImage: '../../assets/reddit-insights-combined.png'
 ---
 
-If you build developer tools, you know the struggle: you try to share what you've built on Reddit, only to have your post instantly removed by moderators for self-promotion. 
+If you build developer tools, you know the struggle of trying to share what you've built online. 
 
-But yesterday, I tried a different approach on `r/reactnative`. Within 24 hours, it became the **<a href="https://www.reddit.com/r/reactnative/comments/1vp300v/how_i_replaced_bloated_lottie_files_with_60fps/" target="_blank" rel="noopener noreferrer">#1 post on r/reactnative that day</a>**, racking up over **12,000 views**, a flood of upvotes, and incredible community engagement. It was also the **<a href="https://www.reddit.com/r/shaders/comments/1vp37ys/i_built_a_webbased_sksl_skia_shading_language/" target="_blank" rel="noopener noreferrer">#1 post on r/shaders that day</a>**!
+Recently, I shared a tool I built to solve my own workflow problems on `r/reactnative`. Within 24 hours, it blew up. It became the **#1 post on r/reactnative that day** and racked up over **12,000 views**, a flood of upvotes, and incredible engagement.
 
-Here is the story of why I built the tool, why the launch worked, and a technical deep dive into the problem that resonated with so many developers: replacing bloated Lottie animations with 60fps Skia shaders.
+Here is a technical deep dive into the problem that resonated with so many developers: replacing bloated Lottie animations with 60fps Skia shaders.
 
 ## The Lottie Performance Bottleneck
 
@@ -32,9 +32,9 @@ I needed a fast, isolated environment to write and test SKSL before dropping it 
 
 So, I built <a href="https://skialabs.dev" target="_blank" rel="noopener noreferrer">Skia Labs</a>, a dedicated SKSL playground powered by CanvasKit WASM. It gives you a Shadertoy-like experience natively in the browser. You write your shader, see it render instantly at 60fps, tweak the math with immediate visual feedback, and then literally copy-paste the exact code block into your React Native, Flutter, or Native Mobile app. 
 
-## The Launch: Lead With the Problem, Not the Product
+## Sharing the Solution
 
-When I launched, I didn't go to Reddit to pitch a product. Developers have an incredibly low tolerance for marketing. Here is the exact post I made on `r/reactnative` that hit #1:
+When I shared this on Reddit, I focused on the problem rather than just dropping a link. Developers have a high appreciation for technical problem-solving. Here is the post I made on `r/reactnative` that resonated so well:
 
 > **How I replaced bloated Lottie files with 60fps Skia shaders in my RN app**
 > 
@@ -50,10 +50,7 @@ When I launched, I didn't go to Reddit to pitch a product. Developers have an in
 > 
 > I just made the tool completely free and public today. Let me know if anyone wants the link to try it out and I’ll drop it in the comments!
 
-This exact copy worked because:
-1. **I named a universal pain point:** Every RN dev has dealt with Lottie performance issues and dropped frames.
-2. **I offered a technical architecture shift:** I explained *why* Skia was fundamentally better at the system level.
-3. **I offered the tool as an afterthought:** I didn't drop a link in the post body. I explained my workflow and made them *ask* for the link in the comments. 
+The response was overwhelming because it named a universal pain point and offered a technical architecture shift to solve it. Almost every RN dev has dealt with Lottie performance issues and dropped frames.
 
 ## The "AI-to-App" Workflow
 
@@ -70,9 +67,7 @@ In the comments, developers asked for a guide on how I actually use this in prac
 
 ## The Takeaway
 
-While the sudden spike in Reddit traffic was exciting, the real validation came from the conversations it started. It proved a simple truth: **when you build tools that solve your own deepest frustrations, you'll almost always find a community fighting the exact same battle.**
-
-The traction didn't come from a clever marketing pitch; it came from genuinely sharing a technical solution to a universal problem.
+While the sudden spike in traffic was exciting, the real validation came from the conversations it started. It proved a simple truth: **when you build tools that solve your own deepest frustrations, you'll almost always find a community fighting the exact same battle.**
 
 If you are fighting with Lottie bloat and frame drops in your RN apps, it might be time to give SKSL a try. You can test out the editor and see the workflow for yourself at <a href="https://skialabs.dev" target="_blank" rel="noopener noreferrer">Skia Labs</a>.
 
