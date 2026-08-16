@@ -4,11 +4,12 @@ import BaseHead from "../components/BaseHead.astro";
 import Footer from "../components/Footer.astro";
 import Header from "../components/Header.astro";
 import profileImage from "../assets/profile.jpg";
+import skiaLabsImage from "../assets/skialabs-web-editor.avif";
 import { SITE_AUTHOR, SITE_TITLE } from "../consts";
 
 const homeTitle = `${SITE_TITLE} | ${SITE_AUTHOR}`;
 const homeDescription =
-	"Abhigyan Mohanta is a software engineer and Open Source Contributor building Kubernetes, AI-native infrastructure, real-time systems, and practical fullstack applications.";
+	"Abhigyan Mohanta is a software engineer and Open Source Contributor building AI-native infrastructure, developer tools, real-time systems, and practical fullstack applications.";
 
 const currentSignals = [
 	"RL-driven Kubernetes Scheduling",
@@ -18,6 +19,7 @@ const currentSignals = [
 	"Go & Elixir Backends",
 	"FullStack AI-Native Applications",
 	"Concurrency",
+	"Distributed Event-Driven Systems",
 ];
 
 const calendlyUrl = "https://calendly.com/cloudnativeabhigyan/30min";
@@ -39,6 +41,8 @@ const techStack = [
 	"Python",
 	"TypeScript",
 	"React.js",
+	"React Native",
+	"Skia",
 	"Node.js",
 	"HTML5",
 	"CSS3",
@@ -72,8 +76,8 @@ const strengths = [
 		body: "WebSockets, media streaming, PubSub flows, and front-to-back state synchronization for products where latency and UX both matter.",
 	},
 	{
-		title: "Builder energy",
-		body: "I like ambiguous problems, technical research, hands-on implementation, and learning in public until the system actually works.",
+		title: "Builder energy & Indie hacking",
+		body: "I like ambiguous problems, building developer tools for the community, hands-on implementation, and learning in public until the system actually works.",
 	},
 ];
 
@@ -134,17 +138,17 @@ const publications = [
 const projects = [
 	{
 		name: "Skia Labs",
-		image: "/skialabs.png",
+		image: skiaLabsImage.src,
 		links: [
-			{ label: "Live", href: "https://skialabs.hostagedown.com" },
+			{ label: "Live", href: "https://skialabs.dev" },
 			{
 				label: "GitHub",
 				href: "https://github.com/ABHIGYAN-MOHANTA/skia-labs",
 			},
 		],
 		status: "Open Source",
-		body: "A beautiful, fast, web-based playground for Skia’s Shader Language (SKSL). Write, preview, and share shaders in real-time, rendered with CanvasKit (Skia WebAssembly) and powered by Next.js.",
-		tags: ["Next.js", "CanvasKit", "Monaco", "TypeScript", "Tailwind"],
+		body: "A high-performance, web-based playground for Skia’s Shader Language (SKSL). Write and preview buttery-smooth 60fps animations natively in the browser, then drop them directly into React Native or Flutter. Reached #1 on r/reactnative and r/shaders.",
+		tags: ["Next.js", "CanvasKit", "React Native", "TypeScript", "WASM"],
 	},
 	{
 		name: "Wands",
